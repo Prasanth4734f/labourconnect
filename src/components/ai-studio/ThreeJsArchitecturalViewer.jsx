@@ -430,7 +430,7 @@ const ThreeJsArchitecturalViewer = forwardRef(function ThreeJsArchitecturalViewe
     renderer.setSize(width, height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.shadowMap.type = THREE.PCFShadowMap;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.15;
     renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -1532,7 +1532,8 @@ const ThreeJsArchitecturalViewer = forwardRef(function ThreeJsArchitecturalViewe
         }
 
         // 3. INTERIOR SKIRTING BOARDS (4-inch architectural baseboard trim)
-        if (isWall && !isExterior && dy > 4 && compType !== 'wall_apron' && compType !== 'wall_header') {
+        const isExteriorWall = compType.includes('exterior') || Boolean(mesh.metadata?.isExterior || mesh.isExterior);
+        if (isWall && !isExteriorWall && dy > 4 && compType !== 'wall_apron' && compType !== 'wall_header') {
           const isAlignedX = dx > dz;
           const skirtingMat = new THREE.MeshStandardMaterial({
             color: isVintageOrTraditional ? '#451a03' : '#1e293b',

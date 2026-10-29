@@ -961,6 +961,81 @@ export function createArchitecturalSkyEnvironment(renderer, isNight = false, sol
 }
 
 /**
+ * Creates Organic Foliage / Leaf Texture for tree canopies and landscape shrubs.
+ */
+export function getFoliageTexture(repeatX = 4, repeatY = 4) {
+  const cacheKey = `foliage_${repeatX}_${repeatY}`;
+  if (textureCache.has(cacheKey)) return textureCache.get(cacheKey);
+  if (typeof document === 'undefined') return null;
+
+  const canvas = document.createElement('canvas');
+  canvas.width = 512;
+  canvas.height = 512;
+  const ctx = canvas.getContext('2d');
+
+  // Deep emerald forest green base
+  ctx.fillStyle = '#166534';
+  ctx.fillRect(0, 0, 512, 512);
+
+  // Micro leaf clusters with varied chlorophyl tones
+  const leafTones = ['#15803d', '#22c55e', '#14532d', '#4ade80', '#16a34a'];
+  for (let i = 0; i < 600; i++) {
+    const lx = Math.random() * 512;
+    const ly = Math.random() * 512;
+    const lr = 3 + Math.random() * 8;
+    ctx.fillStyle = leafTones[Math.floor(Math.random() * leafTones.length)];
+    ctx.beginPath();
+    ctx.arc(lx, ly, lr, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  const map = new THREE.CanvasTexture(canvas);
+  map.wrapS = THREE.RepeatWrapping;
+  map.wrapT = THREE.RepeatWrapping;
+  map.repeat.set(repeatX, repeatY);
+  map.colorSpace = THREE.SRGBColorSpace;
+
+  textureCache.set(cacheKey, map);
+  return map;
+}
+
+/**
+ * Creates Organic Tree Bark Texture for landscape tree trunks.
+ */
+export function getTreeBarkTexture(repeatX = 2, repeatY = 4) {
+  const cacheKey = `tree_bark_${repeatX}_${repeatY}`;
+  if (textureCache.has(cacheKey)) return textureCache.get(cacheKey);
+  if (typeof document === 'undefined') return null;
+
+  const canvas = document.createElement('canvas');
+  canvas.width = 512;
+  canvas.height = 512;
+  const ctx = canvas.getContext('2d');
+
+  // Deep umber timber base
+  ctx.fillStyle = '#3e2723';
+  ctx.fillRect(0, 0, 512, 512);
+
+  // Vertical fibrous bark grain fissures
+  const barkTones = ['#271c19', '#4e342e', '#5d4037', '#1b120c'];
+  for (let x = 0; x < 512; x += 6) {
+    const tone = barkTones[Math.floor(Math.random() * barkTones.length)];
+    ctx.fillStyle = tone;
+    const grooveW = 2 + Math.floor(Math.random() * 4);
+    ctx.fillRect(x, 0, grooveW, 512);
+  }
+
+  const map = new THREE.CanvasTexture(canvas);
+  map.wrapS = THREE.RepeatWrapping;
+  map.wrapT = THREE.RepeatWrapping;
+  map.repeat.set(repeatX, repeatY);
+  map.colorSpace = THREE.SRGBColorSpace;
+
+  textureCache.set(cacheKey, map);
+  return map;
+}
+
+/**
  * Creates authentic physical architectural glass with real transmission and refraction.
  */
 export function createArchitecturalGlassMaterial(options = {}) {

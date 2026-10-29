@@ -15,6 +15,8 @@ import {
   getLinenFabricTexture,
   getGrassLawnTexture,
   getStonePaverTexture,
+  getFoliageTexture,
+  getTreeBarkTexture,
   createArchitecturalSkyEnvironment,
   createArchitecturalGlassMaterial
 } from './architecturalMaterialSystem.js';
@@ -1368,6 +1370,14 @@ const ThreeJsArchitecturalViewer = forwardRef(function ThreeJsArchitecturalViewe
             } else if (compType.includes('counter') || compType.includes('vanity') || compType.includes('hob') || compType.includes('top')) {
               assignedMap = getCalacattaMarbleTexture(2, 2);
             }
+          } else if (isLandscape) {
+            if (compType.includes('canopy') || compType.includes('shrub') || compType.includes('hedge') || compType.includes('foliage')) {
+              assignedMap = getFoliageTexture(4, 4);
+            } else if (compType.includes('trunk') || compType.includes('bark')) {
+              assignedMap = getTreeBarkTexture(2, 4);
+            } else if (compType.includes('walkway') || compType.includes('driveway') || compType.includes('paver')) {
+              assignedMap = getStonePaverTexture(4, 4);
+            }
           }
         }
 
@@ -1476,6 +1486,88 @@ const ThreeJsArchitecturalViewer = forwardRef(function ThreeJsArchitecturalViewe
           const sillMesh = new THREE.Mesh(sillGeo, sillMat);
           sillMesh.position.set(cx, bbox.min.y - 0.06, cz);
           threeMesh.add(sillMesh);
+
+          // 2b. Drapery Panels & Curtain Rod for Residential Living & Bedrooms
+          if (dy > 2.0) {
+            const rodMat = new THREE.MeshStandardMaterial({
+              color: isVintageOrTraditional ? '#78350f' : '#0f172a',
+              roughness: 0.3,
+              metalness: 0.6
+            });
+            const draperyMat = new THREE.MeshStandardMaterial({
+              color: isVintageOrTraditional ? '#fef3c7' : '#f8fafc',
+              roughness: 0.9,
+              metalness: 0.02
+            });
+            const rodGeo = new THREE.CylinderGeometry(0.04, 0.04, (isAlignedX ? dx : dz) + 0.8, 8);
+            const rodMesh = new THREE.Mesh(rodGeo, rodMat);
+            rodMesh.position.set(cx, cy + dy / 2 + 0.25, cz);
+            if (isAlignedX) rodMesh.rotation.z = Math.PI / 2;
+            else rodMesh.rotation.x = Math.PI / 2;
+            threeMesh.add(rodMesh);
+
+            const draperyW = 0.45;
+            const draperyH = dy + 0.4;
+            const dGeo = new THREE.BoxGeometry(
+              isAlignedX ? draperyW : 0.1,
+              draperyH,
+              isAlignedX ? 0.1 : draperyW
+            );
+            const leftDrape = new THREE.Mesh(dGeo, draperyMat);
+            leftDrape.position.set(
+              isAlignedX ? cx - dx / 2 - 0.15 : cx,
+              cy - 0.05,
+              isAlignedX ? cz : cz - dz / 2 - 0.15
+            );
+            threeMesh.add(leftDrape);
+
+            const rightDrape = new THREE.Mesh(dGeo, draperyMat);
+            rightDrape.position.set(
+              isAlignedX ? cx + dx / 2 + 0.15 : cx,
+              cy - 0.05,
+              isAlignedX ? cz : cz + dz / 2 + 0.15
+            );
+            threeMesh.add(rightDrape);
+          }
+        }
+
+        // 3. INTERIOR SKIRTING BOARDS (4-inch architectural baseboard trim)
+        if (isWall && !isExterior && dy > 4 && compType !== 'wall_apron' && compType !== 'wall_header') {
+          const isAlignedX = dx > dz;
+          const skirtingMat = new THREE.MeshStandardMaterial({
+            color: isVintageOrTraditional ? '#451a03' : '#1e293b',
+            roughness: 0.35,
+            metalness: 0.05
+          });
+          const skirtingGeo = new THREE.BoxGeometry(
+            isAlignedX ? dx : 0.15,
+            0.33,
+            isAlignedX ? 0.15 : dz
+          );
+          const skirtingMesh = new THREE.Mesh(skirtingGeo, skirtingMat);
+          skirtingMesh.position.set(cx, bbox.min.y + 0.165, cz);
+          threeMesh.add(skirtingMesh);
+        }
+
+        // 4. ERGONOMIC MODULAR LIGHT SWITCH PLATE NEAR DOORS
+        if (compType === 'door_leaf' && dy > 4) {
+          const switchMat = new THREE.MeshStandardMaterial({
+            color: '#f8fafc',
+            roughness: 0.25,
+            metalness: 0.1
+          });
+          const isAlignedX = dx > dz;
+          const switchGeo = new THREE.BoxGeometry(
+            isAlignedX ? 0.25 : 0.06,
+            0.35,
+            isAlignedX ? 0.06 : 0.25
+          );
+          const switchMesh = new THREE.Mesh(switchGeo, switchMat);
+          const switchY = bbox.min.y + 3.8;
+          const sx = isAlignedX ? (cx - dx * 0.45) : cx;
+          const sz = isAlignedX ? cz : (cz - dz * 0.45);
+          switchMesh.position.set(sx, switchY, sz);
+          threeMesh.add(switchMesh);
         }
       }
 

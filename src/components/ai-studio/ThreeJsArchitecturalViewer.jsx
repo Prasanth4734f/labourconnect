@@ -7,7 +7,16 @@ import {
   getTeakDeckingTexture,
   getPorcelainTileTexture,
   getAreaRugTexture,
-  getPlasterBumpMap
+  getPlasterBumpMap,
+  getMangaloreRoofTileTexture,
+  getTravertineStoneTexture,
+  getBoardFormedConcreteTexture,
+  getCalacattaMarbleTexture,
+  getLinenFabricTexture,
+  getGrassLawnTexture,
+  getStonePaverTexture,
+  createArchitecturalSkyEnvironment,
+  createArchitecturalGlassMaterial
 } from './architecturalMaterialSystem.js';
 import { simplifyRoomName } from './architecturalRoomUtils.js';
 
@@ -482,11 +491,13 @@ const ThreeJsArchitecturalViewer = forwardRef(function ThreeJsArchitecturalViewe
     scene.add(siteGroup);
     siteGroupRef.current = siteGroup;
 
-    const groundGeo = new THREE.PlaneGeometry(160, 160);
+    // Realistic procedural landscape grass lawn texture
+    const lawnTex = getGrassLawnTexture(24, 24);
+    const groundGeo = new THREE.PlaneGeometry(240, 240);
     const groundMat = new THREE.MeshStandardMaterial({
-      color: '#36533d', // Muted natural landscape lawn
-      roughness: 0.95,
-      metalness: 0.01
+      map: lawnTex,
+      roughness: 0.92,
+      metalness: 0.02
     });
     const ground = new THREE.Mesh(groundGeo, groundMat);
     ground.rotation.x = -Math.PI / 2;
@@ -494,11 +505,12 @@ const ThreeJsArchitecturalViewer = forwardRef(function ThreeJsArchitecturalViewe
     ground.receiveShadow = true;
     siteGroup.add(ground);
 
-    // Decorative Concrete Driveway & Entrance Walkway
+    // Realistic interlocking granite stone paver driveway
+    const paverTex = getStonePaverTexture(2, 6);
     const driveGeo = new THREE.PlaneGeometry(16, 42);
     const driveMat = new THREE.MeshStandardMaterial({
-      color: '#cbd5e1',
-      roughness: 0.65,
+      map: paverTex,
+      roughness: 0.55,
       metalness: 0.08
     });
     const driveway = new THREE.Mesh(driveGeo, driveMat);
@@ -506,6 +518,13 @@ const ThreeJsArchitecturalViewer = forwardRef(function ThreeJsArchitecturalViewe
     driveway.position.set(10, 0.02, 5);
     driveway.receiveShadow = true;
     siteGroup.add(driveway);
+
+    // Procedural HDR sky environment map for photorealistic PBR reflections
+    try {
+      scene.environment = createArchitecturalSkyEnvironment(renderer, lightingStyle.isNight, solarTime);
+    } catch (e) {
+      console.warn('[ThreeJsArchitecturalViewer] Sky environment initialization fallback:', e);
+    }
 
     // Contact Shadow Plane (grounds the house with soft ambient occlusion shadow in ALL modes)
     const shadowPlaneGeo = new THREE.PlaneGeometry(160, 160);
@@ -619,7 +638,15 @@ const ThreeJsArchitecturalViewer = forwardRef(function ThreeJsArchitecturalViewe
     hemiLightRef.current.intensity = hemiIntensity;
 
     fillLightRef.current.intensity = fillIntensity;
-  }, [lightingStyle]);
+
+    if (sceneRef.current && rendererRef.current) {
+      try {
+        sceneRef.current.environment = createArchitecturalSkyEnvironment(rendererRef.current, isNight, solarTime);
+      } catch (e) {
+        // Safe fallback
+      }
+    }
+  }, [lightingStyle, solarTime]);
 
   // Build Three.js Meshes from Procedural Building Engine with High-Fidelity Architectural Materials
   useEffect(() => {
@@ -1182,20 +1209,58 @@ const ThreeJsArchitecturalViewer = forwardRef(function ThreeJsArchitecturalViewe
         overrideOpacity = 0.85;
       }
 
-      const material = new THREE.MeshStandardMaterial({
-        color: new THREE.Color(overrideColor),
-        roughness: overrideRoughness,
-        metalness: overrideMetalness,
-        transparent: overrideTransparent,
-        opacity: overrideOpacity,
-        wireframe: overrideWireframe,
-        side: THREE.DoubleSide,
-        emissive: new THREE.Color(overrideEmissive),
-        emissiveIntensity: overrideEmissiveIntensity,
-        bumpMap: usePlasterBump ? getPlasterBumpMap() : null,
-        bumpScale: 0.015,
-        depthWrite: (!overrideTransparent || overrideOpacity > 0.8) && !cutaway.shouldCutaway
-      });
+      let material;
+      const isPhotoreal = currentStyle === 'photorealistic' && !currentPlan;
+      const isGlassComponent = compType.includes('window_pane') || compType.includes('glass') || compType.includes('glazing');
+
+      if (isGlassComponent && isPhotoreal && !cutaway.shouldCutaway) {
+        // Authentic Physical Architectural Float Glass with real transmission and refraction
+        material = createArchitecturalGlassMaterial({
+          color: lightingStyle.isNight ? '#fef08a' : '#bae6fd',
+          transmission: viewMode === 'doors_windows' ? 0.6 : 0.94
+        });
+      } else {
+        let assignedMap = null;
+        let assignedRoughnessMap = null;
+
+        if (isPhotoreal) {
+          if (compType.includes('sloping_roof') || compType.includes('roof_plane') || compType.includes('ridge')) {
+            const roofTex = getMangaloreRoofTileTexture(6, 6);
+            assignedMap = roofTex.map;
+            assignedRoughnessMap = roofTex.roughnessMap;
+          } else if (compType.includes('wall') && !activeRoom && viewMode === 'complete_home') {
+            const styleStr = String(design?.inputs?.archStyle || design?.metadata?.style || '').toLowerCase();
+            if (styleStr.includes('luxury') || styleStr.includes('villa')) {
+              assignedMap = getTravertineStoneTexture(3, 3);
+            } else if (styleStr.includes('minimalist') || styleStr.includes('concrete')) {
+              assignedMap = getBoardFormedConcreteTexture(2, 4);
+            }
+          } else if (isFurniture) {
+            if (compType.includes('sofa') || compType.includes('cushion') || compType.includes('mattress') || compType.includes('pillow') || compType.includes('headboard')) {
+              assignedMap = getLinenFabricTexture(6, 6);
+            } else if (compType.includes('counter') || compType.includes('vanity') || compType.includes('hob') || compType.includes('top')) {
+              assignedMap = getCalacattaMarbleTexture(2, 2);
+            }
+          }
+        }
+
+        material = new THREE.MeshStandardMaterial({
+          color: new THREE.Color(overrideColor),
+          map: assignedMap,
+          roughnessMap: assignedRoughnessMap,
+          roughness: assignedRoughnessMap ? 0.45 : overrideRoughness,
+          metalness: overrideMetalness,
+          transparent: overrideTransparent,
+          opacity: overrideOpacity,
+          wireframe: overrideWireframe,
+          side: THREE.DoubleSide,
+          emissive: new THREE.Color(overrideEmissive),
+          emissiveIntensity: overrideEmissiveIntensity,
+          bumpMap: usePlasterBump ? getPlasterBumpMap() : null,
+          bumpScale: 0.015,
+          depthWrite: (!overrideTransparent || overrideOpacity > 0.8) && !cutaway.shouldCutaway
+        });
+      }
 
       const threeMesh = new THREE.Mesh(geometry, material);
       threeMesh.castShadow = !overrideTransparent;

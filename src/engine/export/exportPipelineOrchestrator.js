@@ -15,6 +15,7 @@ import { generateArchitecturalDxf } from './dxfExporter.js';
 import { generateBinaryGlb, generateEmbeddedGltfJson } from './gltfExporter.js';
 import { generateWavefrontObj } from './objExporter.js';
 import { generateArchitecturalPdf } from './pdfDocumentExporter.js';
+import { generateBlenderCyclesPythonScript } from './blenderCyclesExporter.js';
 import {
   exportProjectDataJson,
   exportRoomScheduleCsv,
@@ -31,6 +32,7 @@ export const EXPORT_FORMATS = {
   GLB: 'glb',
   GLTF: 'gltf',
   OBJ: 'obj',
+  BLENDER_CYCLES_SCRIPT: 'blender_cycles_script',
   PDF_SHEETS: 'pdf_sheets',
   JSON_PROJECT_DATA: 'json_project_data',
   CSV_ROOM_SCHEDULE: 'csv_room_schedule',
@@ -117,6 +119,18 @@ export function exportDesignArtifact(canonicalDesign, formatId, options = {}) {
         mtlFilename: `${code}_3D_Model.mtl`,
         mimeType: 'text/plain',
         byteSize: objBundle.obj.length,
+        isBinary: false
+      };
+    }
+
+    case EXPORT_FORMATS.BLENDER_CYCLES_SCRIPT: {
+      const pyContent = generateBlenderCyclesPythonScript(canonicalDesign, options);
+      return {
+        formatId,
+        content: pyContent,
+        filename: `${code}_Blender_Cycles_Setup.py`,
+        mimeType: 'text/x-python',
+        byteSize: pyContent.length,
         isBinary: false
       };
     }

@@ -21,6 +21,7 @@ import {
 import { buildProcedural3dGeometry, project3dToViewport } from '../../engine/geometry/procedural3dGenerator.js';
 import { planWalkthroughPath, validateWalkthroughTrajectory } from '../../engine/geometry/walkthroughPathPlanner.js';
 import { generateLayoutCandidate } from '../../engine/generator/layoutGenerator.js';
+import ThreeJsArchitecturalViewer from './ThreeJsArchitecturalViewer';
 
 /**
  * CinematicWalkthroughStudio
@@ -90,6 +91,7 @@ export default function CinematicWalkthroughStudio({
   const waypoints = trajectory?.waypoints || [];
 
   // Playback state
+  const [viewportEngine, setViewportEngine] = useState('webgl_3d'); // 'webgl_3d' | 'cinematic_vector'
   const [currentSceneIdx, setCurrentSceneIdx] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
   const [playbackSpeed, setPlaybackSpeed] = useState(1);
@@ -297,8 +299,32 @@ export default function CinematicWalkthroughStudio({
           </h3>
         </div>
 
-        {/* Flight Mode Buttons */}
+        {/* Flight Mode & Engine Toggle Buttons */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+          {/* WebGL 3D vs Cinematic Rails Engine Selector */}
+          <button
+            onClick={() => setViewportEngine(viewportEngine === 'webgl_3d' ? 'cinematic_vector' : 'webgl_3d')}
+            style={{
+              padding: '6px 12px',
+              borderRadius: '8px',
+              fontSize: '0.74rem',
+              fontWeight: 800,
+              cursor: 'pointer',
+              border: viewportEngine === 'webgl_3d' ? '1px solid #38bdf8' : '1px solid #334155',
+              background: viewportEngine === 'webgl_3d' ? 'rgba(56, 189, 248, 0.22)' : '#1e293b',
+              color: viewportEngine === 'webgl_3d' ? '#38bdf8' : '#94a3b8',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              boxShadow: viewportEngine === 'webgl_3d' ? '0 0 12px rgba(56, 189, 248, 0.3)' : 'none',
+              transition: 'all 0.15s ease'
+            }}
+            title="Toggle between Three.js WebGL Realtime 3D Engine and Cinematic Vector Projection"
+          >
+            <Video size={13} />
+            <span>{viewportEngine === 'webgl_3d' ? '🎮 3D WebGL PBR Engine' : '🎬 2D Rail Projection'}</span>
+          </button>
+
           {[
             { id: 'cinematic', label: 'Cinematic Dolly', icon: <Camera size={13} /> },
             { id: 'first_person', label: 'Eye-Level (1.7m)', icon: <Eye size={13} /> },
@@ -385,8 +411,20 @@ export default function CinematicWalkthroughStudio({
           boxShadow: '0 12px 36px rgba(0,0,0,0.6)'
         }}
       >
-        {/* Real Procedural 3D Building Scene SVG */}
-        {projectedScene && projectedScene.projectedPolygons?.length > 0 ? (
+        {/* Real Procedural 3D Building Scene (WebGL Three.js or Projected SVG) */}
+        {viewportEngine === 'webgl_3d' ? (
+          <div style={{ width: '100%', height: '100%', position: 'relative' }}>
+            <ThreeJsArchitecturalViewer
+              meshes={buildingGeometries?.meshes || []}
+              design={activeDesign}
+              viewAngle="walkthrough"
+              viewMode="infrastructure"
+              showRoomLabels={false}
+              renderingStyle="photorealistic"
+              backgroundMode="garden"
+            />
+          </div>
+        ) : projectedScene && projectedScene.projectedPolygons?.length > 0 ? (
           <svg
             viewBox="0 0 700 460"
             style={{

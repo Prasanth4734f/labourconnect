@@ -170,6 +170,15 @@ export default function ExportDocumentationModal({
         title: 'glTF 2.0 Embedded JSON (.gltf)',
         desc: 'Text-based glTF 2.0 document with inline base64 data URI buffers. Ideal for web viewers and three.js integration without external asset dependencies.',
         layers: ['Standard glTF 2.0 Scene Graph']
+      },
+      {
+        id: EXPORT_FORMATS.BLENDER_CYCLES_SCRIPT,
+        formatBadge: 'CYCLES',
+        badgeColor: '#E11D48',
+        badgeBg: '#FFE4E6',
+        title: 'Blender Cycles 4K Raytrace Setup (.py)',
+        desc: 'Automated Python script for Blender 3.x / 4.x. Sets up Nishita physical atmospheric sky, Filmic high-contrast color management, Principled BSDF node shaders, and multi-angle 4K cameras.',
+        layers: ['Cycles Raytracing', 'Nishita Sky & Sun', 'Principled BSDF Nodes', '4K Cameras']
       }
     ],
     'pdf_sheets': [

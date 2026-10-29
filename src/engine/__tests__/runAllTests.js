@@ -44,6 +44,7 @@ import { runProceduralElectricalEngineTests } from './proceduralElectricalEngine
 import { runSprint5TransformationTests } from './sprint5Transformation.test.js';
 import { runVisuals5dParityTests } from './visuals5dParity.test.js';
 import { runVintageIndianRegressionTests } from './vintageIndianHouseRegression.test.js';
+import { runPhotorealisticEngineTests } from './photorealisticEngine.test.js';
 
 export function runAllTests() {
   const startTime = Date.now();
@@ -81,7 +82,8 @@ export function runAllTests() {
     { name: '[S4] Procedural Electrical & Lighting', runner: runProceduralElectricalEngineTests },
     { name: '[S5] Complete Architectural Transformation', runner: runSprint5TransformationTests },
     { name: '[S5D] 5D Visuals Parity & Cutaways Suite', runner: runVisuals5dParityTests },
-    { name: '[S5-REG] Vintage Indian House Regression', runner: runVintageIndianRegressionTests }
+    { name: '[S5-REG] Vintage Indian House Regression', runner: runVintageIndianRegressionTests },
+    { name: '[S6-PHOTO] Photorealistic Visualization Engine', runner: runPhotorealisticEngineTests }
   ];
 
   const results = [];

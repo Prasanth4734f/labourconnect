@@ -504,3 +504,480 @@ export function applyPlanarUVs(geometry, worldScale = 10.0) {
   geometry.attributes.uv.needsUpdate = true;
   return geometry;
 }
+
+/**
+ * Creates genuine Mangalore Terracotta Clay Tile texture for sloping pitched roofs.
+ * Renders interlocking arched tile profiles with realistic terracotta color gradients,
+ * edge overlap shadows, ridge highlights, and natural kiln firing variations.
+ */
+export function getMangaloreRoofTileTexture(repeatX = 6, repeatY = 6) {
+  const cacheKey = `roof_mangalore_clay_${repeatX}_${repeatY}`;
+  if (textureCache.has(cacheKey)) return textureCache.get(cacheKey);
+
+  const canvas = document.createElement('canvas');
+  canvas.width = 1024;
+  canvas.height = 1024;
+  const ctx = canvas.getContext('2d');
+
+  const rCanvas = document.createElement('canvas');
+  rCanvas.width = 1024;
+  rCanvas.height = 1024;
+  const rCtx = rCanvas.getContext('2d');
+
+  // Deep shadow base for inter-tile joints
+  ctx.fillStyle = '#450a0a';
+  ctx.fillRect(0, 0, 1024, 1024);
+  rCtx.fillStyle = '#ffffff';
+  rCtx.fillRect(0, 0, 1024, 1024);
+
+  const numCourses = 16; // 16 horizontal courses of overlapping tiles
+  const courseH = 1024 / numCourses;
+  const tilesPerCourse = 12;
+  const tileW = 1024 / tilesPerCourse;
+
+  const terracottaPalettes = [
+    { base: '#b91c1c', highlight: '#dc2626', shadow: '#7f1d1d', dark: '#571010' },
+    { base: '#c2410c', highlight: '#ea580c', shadow: '#9a3412', dark: '#631d07' },
+    { base: '#a13317', highlight: '#c04a25', shadow: '#77240e', dark: '#4f1406' },
+    { base: '#b4341b', highlight: '#d24727', shadow: '#88210c', dark: '#591507' }
+  ];
+
+  for (let c = 0; c < numCourses; c++) {
+    const y = c * courseH;
+    const h = courseH + 4; // slight overlap over row below
+    const courseOffset = (c % 2) * (tileW * 0.5);
+
+    for (let t = -1; t <= tilesPerCourse + 1; t++) {
+      const x = t * tileW + courseOffset;
+      const pal = terracottaPalettes[(c * 7 + Math.abs(t)) % terracottaPalettes.length];
+
+      // Draw curved corrugated barrel tile profile
+      const grad = ctx.createLinearGradient(x, y, x + tileW, y);
+      grad.addColorStop(0, pal.dark);
+      grad.addColorStop(0.18, pal.shadow);
+      grad.addColorStop(0.48, pal.highlight); // Barrel crest highlight
+      grad.addColorStop(0.78, pal.base);
+      grad.addColorStop(1.0, pal.dark); // Water trough shadow
+
+      ctx.fillStyle = grad;
+      ctx.fillRect(Math.max(0, x + 1), y, Math.min(1024 - x - 1, tileW - 2), h);
+
+      // Roughness map (clay surface: semi-rough with smoother crest)
+      const rGrad = rCtx.createLinearGradient(x, y, x + tileW, y);
+      rGrad.addColorStop(0, '#c0c0c0');
+      rGrad.addColorStop(0.48, '#707070'); // Crest has slight clay sheen
+      rGrad.addColorStop(1.0, '#d0d0d0');
+      rCtx.fillStyle = rGrad;
+      rCtx.fillRect(Math.max(0, x + 1), y, Math.min(1024 - x - 1, tileW - 2), h);
+
+      // Subtle clay surface stipple / grain
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.06)';
+      for (let s = 0; s < 4; s++) {
+        const sx = x + ((s * 23 + c * 17) % (tileW - 6)) + 3;
+        const sy = y + ((s * 19 + t * 13) % (h - 4)) + 2;
+        ctx.fillRect(sx, sy, 3, 2);
+      }
+
+      // Bottom overlap drop shadow onto lower course
+      ctx.fillStyle = 'rgba(20, 5, 5, 0.45)';
+      ctx.fillRect(Math.max(0, x), y + h - 3, Math.min(1024 - x, tileW), 3);
+
+      // Top edge delicate highlight
+      ctx.fillStyle = 'rgba(255, 230, 210, 0.22)';
+      ctx.fillRect(Math.max(0, x + 2), y, Math.min(1024 - x - 4, tileW - 4), 1.5);
+    }
+  }
+
+  const map = new THREE.CanvasTexture(canvas);
+  map.wrapS = THREE.RepeatWrapping;
+  map.wrapT = THREE.RepeatWrapping;
+  map.repeat.set(repeatX, repeatY);
+  map.colorSpace = THREE.SRGBColorSpace;
+
+  const roughnessMap = new THREE.CanvasTexture(rCanvas);
+  roughnessMap.wrapS = THREE.RepeatWrapping;
+  roughnessMap.wrapT = THREE.RepeatWrapping;
+  roughnessMap.repeat.set(repeatX, repeatY);
+
+  const result = { map, roughnessMap };
+  textureCache.set(cacheKey, result);
+  return result;
+}
+
+/**
+ * Creates Honed Italian Travertine / Natural Limestone texture.
+ * Features subtle horizontal sedimentary banding and micropores.
+ */
+export function getTravertineStoneTexture(repeatX = 3, repeatY = 3) {
+  const cacheKey = `travertine_${repeatX}_${repeatY}`;
+  if (textureCache.has(cacheKey)) return textureCache.get(cacheKey);
+
+  const canvas = document.createElement('canvas');
+  canvas.width = 1024;
+  canvas.height = 1024;
+  const ctx = canvas.getContext('2d');
+
+  // Base warm honed cream/ivory
+  ctx.fillStyle = '#f5efe6';
+  ctx.fillRect(0, 0, 1024, 1024);
+
+  // Soft horizontal sedimentary bands
+  const bands = 36;
+  const bandH = 1024 / bands;
+  for (let b = 0; b < bands; b++) {
+    const y = b * bandH;
+    const bandTone = (b % 3 === 0) ? 'rgba(226, 215, 198, 0.55)' : (b % 2 === 0 ? 'rgba(238, 230, 217, 0.4)' : 'rgba(214, 201, 182, 0.35)');
+    ctx.fillStyle = bandTone;
+    ctx.fillRect(0, y, 1024, bandH + (Math.sin(b * 0.8) * 3));
+
+    // Natural horizontal porous striations
+    ctx.strokeStyle = 'rgba(180, 165, 145, 0.22)';
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.moveTo(0, y + bandH * 0.5);
+    ctx.bezierCurveTo(
+      340, y + bandH * 0.5 + Math.sin(b) * 4,
+      680, y + bandH * 0.5 - Math.sin(b) * 4,
+      1024, y + bandH * 0.5
+    );
+    ctx.stroke();
+  }
+
+  // Scattered tiny limestone micropores
+  ctx.fillStyle = 'rgba(140, 125, 105, 0.18)';
+  for (let i = 0; i < 400; i++) {
+    const px = (i * 137.5) % 1024;
+    const py = (i * 269.3) % 1024;
+    const pw = 1 + (i % 3);
+    const ph = 1 + (i % 2);
+    ctx.fillRect(px, py, pw, ph);
+  }
+
+  const map = new THREE.CanvasTexture(canvas);
+  map.wrapS = THREE.RepeatWrapping;
+  map.wrapT = THREE.RepeatWrapping;
+  map.repeat.set(repeatX, repeatY);
+  map.colorSpace = THREE.SRGBColorSpace;
+
+  textureCache.set(cacheKey, map);
+  return map;
+}
+
+/**
+ * Creates Board-Formed Architectural Exposed Concrete texture.
+ * Imprints horizontal timber formwork boards, wood grain relief, and tie-rod holes.
+ */
+export function getBoardFormedConcreteTexture(repeatX = 2, repeatY = 4) {
+  const cacheKey = `board_formed_concrete_${repeatX}_${repeatY}`;
+  if (textureCache.has(cacheKey)) return textureCache.get(cacheKey);
+
+  const canvas = document.createElement('canvas');
+  canvas.width = 1024;
+  canvas.height = 1024;
+  const ctx = canvas.getContext('2d');
+
+  // Base raw architectural concrete
+  ctx.fillStyle = '#cbd5e1';
+  ctx.fillRect(0, 0, 1024, 1024);
+
+  const numBoards = 12;
+  const boardH = 1024 / numBoards;
+
+  for (let i = 0; i < numBoards; i++) {
+    const y = i * boardH;
+    const shade = (i % 2 === 0) ? '#d1d9e2' : '#c4ceda';
+    ctx.fillStyle = shade;
+    ctx.fillRect(0, y, 1024, boardH);
+
+    // Board wood grain lines
+    ctx.fillStyle = 'rgba(100, 116, 139, 0.12)';
+    for (let g = 0; g < 5; g++) {
+      ctx.fillRect(0, y + (g / 5) * boardH, 1024, 1.2);
+    }
+
+    // Horizontal formwork board seam shadow & highlight
+    ctx.fillStyle = 'rgba(51, 65, 85, 0.45)';
+    ctx.fillRect(0, y + boardH - 2, 1024, 2);
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.25)';
+    ctx.fillRect(0, y, 1024, 1.2);
+
+    // Form tie-rod holes (circular indented plugs spaced evenly)
+    [180, 512, 844].forEach(hx => {
+      ctx.beginPath();
+      ctx.arc(hx, y + boardH / 2, 6, 0, Math.PI * 2);
+      ctx.fillStyle = '#64748b';
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(hx, y + boardH / 2, 4.5, 0, Math.PI * 2);
+      ctx.fillStyle = '#334155';
+      ctx.fill();
+    });
+  }
+
+  const map = new THREE.CanvasTexture(canvas);
+  map.wrapS = THREE.RepeatWrapping;
+  map.wrapT = THREE.RepeatWrapping;
+  map.repeat.set(repeatX, repeatY);
+  map.colorSpace = THREE.SRGBColorSpace;
+
+  textureCache.set(cacheKey, map);
+  return map;
+}
+
+/**
+ * Creates High-Gloss Calacatta Gold / Carrara Polished Marble texture.
+ * Features branching fractal veins with soft smoke boundaries and gold accents.
+ */
+export function getCalacattaMarbleTexture(repeatX = 2, repeatY = 2) {
+  const cacheKey = `calacatta_marble_${repeatX}_${repeatY}`;
+  if (textureCache.has(cacheKey)) return textureCache.get(cacheKey);
+
+  const canvas = document.createElement('canvas');
+  canvas.width = 1024;
+  canvas.height = 1024;
+  const ctx = canvas.getContext('2d');
+
+  // Polished luminous white marble ground
+  ctx.fillStyle = '#fafbfc';
+  ctx.fillRect(0, 0, 1024, 1024);
+
+  // Soft atmospheric marble clouding
+  const grad = ctx.createRadialGradient(400, 450, 50, 512, 512, 600);
+  grad.addColorStop(0, 'rgba(241, 245, 249, 0.6)');
+  grad.addColorStop(0.5, 'rgba(226, 232, 240, 0.35)');
+  grad.addColorStop(1, 'rgba(248, 250, 252, 0.8)');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, 1024, 1024);
+
+  // Major organic branching veins
+  const drawVein = (startX, startY, endX, endY, width, color) => {
+    ctx.strokeStyle = color;
+    ctx.lineWidth = width;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+
+    ctx.beginPath();
+    ctx.moveTo(startX, startY);
+    const midX1 = (startX * 2 + endX) / 3 + (Math.sin(startX) * 45);
+    const midY1 = (startY * 2 + endY) / 3 + (Math.cos(startY) * 40);
+    const midX2 = (startX + endX * 2) / 3 - (Math.cos(endX) * 45);
+    const midY2 = (startY + endY * 2) / 3 - (Math.sin(endY) * 40);
+    ctx.bezierCurveTo(midX1, midY1, midX2, midY2, endX, endY);
+    ctx.stroke();
+  };
+
+  // 1. Broad soft smoke feather veins
+  drawVein(50, 0, 950, 1024, 18, 'rgba(148, 163, 184, 0.12)');
+  drawVein(0, 300, 1024, 750, 14, 'rgba(148, 163, 184, 0.10)');
+
+  // 2. Defined charcoal grey veins
+  drawVein(60, 0, 940, 1024, 5, 'rgba(71, 85, 105, 0.28)');
+  drawVein(0, 310, 1024, 740, 4, 'rgba(71, 85, 105, 0.25)');
+  drawVein(420, 280, 780, 520, 3, 'rgba(71, 85, 105, 0.22)');
+
+  // 3. Delicate Italian gold veining accents
+  drawVein(70, 10, 930, 1010, 2, 'rgba(217, 145, 30, 0.25)');
+  drawVein(10, 318, 1010, 735, 1.8, 'rgba(217, 145, 30, 0.22)');
+
+  const map = new THREE.CanvasTexture(canvas);
+  map.wrapS = THREE.RepeatWrapping;
+  map.wrapT = THREE.RepeatWrapping;
+  map.repeat.set(repeatX, repeatY);
+  map.colorSpace = THREE.SRGBColorSpace;
+
+  textureCache.set(cacheKey, map);
+  return map;
+}
+
+/**
+ * Creates Woven Linen / Fabric Texture for sofas, upholstered chairs, cushions, and headboards.
+ */
+export function getLinenFabricTexture(repeatX = 8, repeatY = 8) {
+  const cacheKey = `linen_fabric_${repeatX}_${repeatY}`;
+  if (textureCache.has(cacheKey)) return textureCache.get(cacheKey);
+
+  const canvas = document.createElement('canvas');
+  canvas.width = 512;
+  canvas.height = 512;
+  const ctx = canvas.getContext('2d');
+
+  ctx.fillStyle = '#64748b';
+  ctx.fillRect(0, 0, 512, 512);
+
+  // Warp and weft yarn weave
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.08)';
+  for (let y = 0; y < 512; y += 4) {
+    for (let x = 0; x < 512; x += 4) {
+      if ((x + y) % 8 === 0) {
+        ctx.fillRect(x, y, 2, 2);
+      }
+    }
+  }
+
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.12)';
+  for (let y = 0; y < 512; y += 4) {
+    for (let x = 0; x < 512; x += 4) {
+      if ((x - y + 512) % 8 === 0) {
+        ctx.fillRect(x, y, 2, 2);
+      }
+    }
+  }
+
+  const map = new THREE.CanvasTexture(canvas);
+  map.wrapS = THREE.RepeatWrapping;
+  map.wrapT = THREE.RepeatWrapping;
+  map.repeat.set(repeatX, repeatY);
+  map.colorSpace = THREE.SRGBColorSpace;
+
+  textureCache.set(cacheKey, map);
+  return map;
+}
+
+/**
+ * Creates Natural Landscape Grass Lawn texture.
+ * Features multi-toned emerald and olive stippled blades for garden plots.
+ */
+export function getGrassLawnTexture(repeatX = 12, repeatY = 12) {
+  const cacheKey = `grass_lawn_${repeatX}_${repeatY}`;
+  if (textureCache.has(cacheKey)) return textureCache.get(cacheKey);
+
+  const canvas = document.createElement('canvas');
+  canvas.width = 512;
+  canvas.height = 512;
+  const ctx = canvas.getContext('2d');
+
+  ctx.fillStyle = '#22543d';
+  ctx.fillRect(0, 0, 512, 512);
+
+  const grassColors = ['#15803d', '#166534', '#14532d', '#2d6a4f', '#1b4332'];
+  for (let i = 0; i < 3500; i++) {
+    const x = (i * 73) % 512;
+    const y = (i * 127) % 512;
+    ctx.fillStyle = grassColors[i % grassColors.length];
+    ctx.fillRect(x, y, 2, 3);
+  }
+
+  const map = new THREE.CanvasTexture(canvas);
+  map.wrapS = THREE.RepeatWrapping;
+  map.wrapT = THREE.RepeatWrapping;
+  map.repeat.set(repeatX, repeatY);
+  map.colorSpace = THREE.SRGBColorSpace;
+
+  textureCache.set(cacheKey, map);
+  return map;
+}
+
+/**
+ * Creates Natural Stone / Granite Paver texture for walkways and driveways.
+ */
+export function getStonePaverTexture(repeatX = 4, repeatY = 4) {
+  const cacheKey = `stone_paver_${repeatX}_${repeatY}`;
+  if (textureCache.has(cacheKey)) return textureCache.get(cacheKey);
+
+  const canvas = document.createElement('canvas');
+  canvas.width = 1024;
+  canvas.height = 1024;
+  const ctx = canvas.getContext('2d');
+
+  // Mortar joint base
+  ctx.fillStyle = '#334155';
+  ctx.fillRect(0, 0, 1024, 1024);
+
+  const rows = 8;
+  const rowH = 1024 / rows;
+  const paverW = 128;
+  const paverColors = ['#94a3b8', '#cbd5e1', '#64748b', '#a0aec0', '#718096'];
+
+  for (let r = 0; r < rows; r++) {
+    const y = r * rowH + 3;
+    const h = rowH - 6;
+    const offset = (r % 2 === 0) ? 0 : paverW / 2;
+
+    for (let x = -offset; x < 1024; x += paverW) {
+      const color = paverColors[(r * 5 + Math.abs(Math.floor(x / paverW))) % paverColors.length];
+      ctx.fillStyle = color;
+      ctx.fillRect(Math.max(0, x + 3), y, Math.min(1024 - x - 3, paverW - 6), h);
+
+      // Subtle edge bevel
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.22)';
+      ctx.fillRect(Math.max(0, x + 3), y, Math.min(1024 - x - 3, paverW - 6), 2);
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.28)';
+      ctx.fillRect(Math.max(0, x + 3), y + h - 2, Math.min(1024 - x - 3, paverW - 6), 2);
+    }
+  }
+
+  const map = new THREE.CanvasTexture(canvas);
+  map.wrapS = THREE.RepeatWrapping;
+  map.wrapT = THREE.RepeatWrapping;
+  map.repeat.set(repeatX, repeatY);
+  map.colorSpace = THREE.SRGBColorSpace;
+
+  textureCache.set(cacheKey, map);
+  return map;
+}
+
+/**
+ * Creates procedural HDR equirectangular sky & atmosphere environment map.
+ * Generates natural daylight zenith, atmospheric horizon haze, and ground bounce
+ * so glass, chrome, and polished materials receive realistic architectural reflections.
+ */
+export function createArchitecturalSkyEnvironment(renderer, isNight = false, solarTime = 12) {
+  const canvas = document.createElement('canvas');
+  canvas.width = 1024;
+  canvas.height = 512;
+  const ctx = canvas.getContext('2d');
+
+  const grad = ctx.createLinearGradient(0, 0, 0, 512);
+  if (isNight) {
+    grad.addColorStop(0, '#020617'); // Deep cosmic zenith
+    grad.addColorStop(0.48, '#0f172a');
+    grad.addColorStop(0.50, '#1e293b'); // Horizon glow
+    grad.addColorStop(0.52, '#090d16');
+    grad.addColorStop(1.0, '#020617'); // Night ground
+  } else if (solarTime >= 16.5 || solarTime <= 7.0) {
+    // Warm Golden Hour
+    grad.addColorStop(0, '#38bdf8'); // Clear sky zenith
+    grad.addColorStop(0.45, '#fed7aa'); // Golden atmosphere
+    grad.addColorStop(0.50, '#f97316'); // Blazing horizon
+    grad.addColorStop(0.52, '#7c2d12');
+    grad.addColorStop(1.0, '#1c1917'); // Warm ground
+  } else {
+    // Clean Architectural Daylight
+    grad.addColorStop(0, '#0284c7'); // Rich blue zenith
+    grad.addColorStop(0.42, '#7dd3fc');
+    grad.addColorStop(0.50, '#f8fafc'); // Crisp white horizon haze
+    grad.addColorStop(0.52, '#94a3b8');
+    grad.addColorStop(1.0, '#334155'); // Earth bounce
+  }
+
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, 1024, 512);
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.mapping = THREE.EquirectangularReflectionMapping;
+  texture.colorSpace = THREE.SRGBColorSpace;
+
+  return texture;
+}
+
+/**
+ * Creates authentic physical architectural glass with real transmission and refraction.
+ */
+export function createArchitecturalGlassMaterial(options = {}) {
+  return new THREE.MeshPhysicalMaterial({
+    color: new THREE.Color(options.color || '#bae6fd'),
+    transmission: options.transmission !== undefined ? options.transmission : 0.92,
+    opacity: 1.0,
+    transparent: true,
+    roughness: 0.04,
+    metalness: 0.08,
+    ior: 1.52, // Architectural float glass index of refraction
+    thickness: 0.3,
+    specularIntensity: 1.0,
+    clearcoat: 1.0,
+    clearcoatRoughness: 0.02,
+    side: THREE.DoubleSide,
+    depthWrite: false
+  });
+}
+

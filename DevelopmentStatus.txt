@@ -1,0 +1,3 @@
+In AI Design Sudio:
+    1. Developed 2D Designer
+    2. Developed 3D Designer (Touch Sensitive)

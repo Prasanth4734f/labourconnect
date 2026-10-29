@@ -1,0 +1,11 @@
+Component Category,Component Name,Applied Material,Finish / Texture,Base Color Hex,Classification,Provenance
+Civil Structure,Substructure Foundation & Plinth,RCC M25 with Anti-Termite Treatment,Damp-Proof Membrane,#A3A69F,Structural,CANONICAL_SPEC
+Civil Structure,Superstructure Columns & Slabs,Reinforced Cement Concrete Fe500D,Shuttering Finish,#B5B8B1,Structural,CANONICAL_SPEC
+Masonry,Exterior Loadbearing Walls,Solid Concrete Block / Wirecut Red Brick,Cement Sand Plaster 20mm,#E8E4DA,Building Envelope,CANONICAL_SPEC
+Masonry,Internal Partition Walls,"Fly-Ash Lightweight Brick 4.5"" Thk",Gypsum Smooth Plaster 12mm,#F5F5F0,Interior Partition,CANONICAL_SPEC
+Architectural Finishes,Living & Dining Flooring,Double-Charged Vitrified Tiles 4ft × 2ft,High Gloss Mirror Polish,#EDECE8,Interior Finish,CANONICAL_SPEC
+Architectural Finishes,Master Bedroom Flooring,Laminated Hardwood Oak Plank,Matte Satin Wood Grain,#C29B72,Interior Finish,CANONICAL_SPEC
+Architectural Finishes,Kitchen & Utility Countertop,Jet Black Polished Granite 20mm,Beveled Edge Polish,#1A1A1A,Millwork,CANONICAL_SPEC
+Architectural Finishes,Exterior Facade Cladding,Travertine Roman Stone & Textured Paint,Weatherproof Acrylic Emulsion,#D4CEBF,Exterior Facade,CANONICAL_SPEC
+Fenestration,Window Frames & Glazing,Anthracite Multi-Chamber UPVC,6mm Low-E Toughened Glass,#383E42,Openings,CANONICAL_SPEC
+Sacred / Sacred Wood,Pooja Mandir Altar,Burma Teak Wood with Brass Bell Inlays,Natural Polyurethane Polish,#8B5A2B,Custom Joinery,CANONICAL_SPEC

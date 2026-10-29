@@ -1,0 +1,196 @@
+# LabourConnect 2.0 AI Architect - Material Template Library
+# Associated OBJ: DES_CANON_01.obj
+# Date: 2026-10-26T15:18:31.638Z
+
+newmtl Polished_Jet-Black_Granite_Plinth_Cladding
+Ka 0.200 0.200 0.200
+Kd 0.059 0.09 0.165
+Ks 0.100 0.100 0.100
+Ns 32.0
+d 1
+illum 2
+
+newmtl Contemporary_Smooth_Off-White_Acrylic_Plaster
+Ka 0.200 0.200 0.200
+Kd 0.973 0.98 0.988
+Ks 0.100 0.100 0.100
+Ns 32.0
+d 1
+illum 2
+
+newmtl Solar-Reflective_High_SRI_Ceramic_Terrace_Screed
+Ka 0.200 0.200 0.200
+Kd 0.973 0.98 0.988
+Ks 0.100 0.100 0.100
+Ns 32.0
+d 1
+illum 2
+
+newmtl Waterproof_Acrylic_Screeded_Parapet_Wall
+Ka 0.200 0.200 0.200
+Kd 0.58 0.639 0.722
+Ks 0.100 0.100 0.100
+Ns 32.0
+d 1
+illum 2
+
+newmtl furniture
+Ka 0.200 0.200 0.200
+Kd 0.8 0.8 0.8
+Ks 0.100 0.100 0.100
+Ns 32.0
+d 1
+illum 2
+
+newmtl landscape_lawn
+Ka 0.200 0.200 0.200
+Kd 0.8 0.8 0.8
+Ks 0.100 0.100 0.100
+Ns 32.0
+d 1
+illum 2
+
+newmtl landscape_driveway
+Ka 0.200 0.200 0.200
+Kd 0.8 0.8 0.8
+Ks 0.100 0.100 0.100
+Ns 32.0
+d 1
+illum 2
+
+newmtl landscape_walkway
+Ka 0.200 0.200 0.200
+Kd 0.8 0.8 0.8
+Ks 0.100 0.100 0.100
+Ns 32.0
+d 1
+illum 2
+
+newmtl landscape_patio
+Ka 0.200 0.200 0.200
+Kd 0.8 0.8 0.8
+Ks 0.100 0.100 0.100
+Ns 32.0
+d 1
+illum 2
+
+newmtl outdoor_furniture
+Ka 0.200 0.200 0.200
+Kd 0.8 0.8 0.8
+Ks 0.100 0.100 0.100
+Ns 32.0
+d 1
+illum 2
+
+newmtl landscape_planter
+Ka 0.200 0.200 0.200
+Kd 0.8 0.8 0.8
+Ks 0.100 0.100 0.100
+Ns 32.0
+d 1
+illum 2
+
+newmtl compound_wall
+Ka 0.200 0.200 0.200
+Kd 0.8 0.8 0.8
+Ks 0.100 0.100 0.100
+Ns 32.0
+d 1
+illum 2
+
+newmtl compound_wall_coping
+Ka 0.200 0.200 0.200
+Kd 0.8 0.8 0.8
+Ks 0.100 0.100 0.100
+Ns 32.0
+d 1
+illum 2
+
+newmtl gate_pillar
+Ka 0.200 0.200 0.200
+Kd 0.8 0.8 0.8
+Ks 0.100 0.100 0.100
+Ns 32.0
+d 1
+illum 2
+
+newmtl gate_pillar_cap
+Ka 0.200 0.200 0.200
+Kd 0.8 0.8 0.8
+Ks 0.100 0.100 0.100
+Ns 32.0
+d 1
+illum 2
+
+newmtl entrance_gate_frame
+Ka 0.200 0.200 0.200
+Kd 0.8 0.8 0.8
+Ks 0.100 0.100 0.100
+Ns 32.0
+d 1
+illum 2
+
+newmtl entrance_gate_louver
+Ka 0.200 0.200 0.200
+Kd 0.8 0.8 0.8
+Ks 0.100 0.100 0.100
+Ns 32.0
+d 1
+illum 2
+
+newmtl landscape_tree_trunk
+Ka 0.200 0.200 0.200
+Kd 0.8 0.8 0.8
+Ks 0.100 0.100 0.100
+Ns 32.0
+d 1
+illum 2
+
+newmtl landscape_tree_canopy
+Ka 0.200 0.200 0.200
+Kd 0.8 0.8 0.8
+Ks 0.100 0.100 0.100
+Ns 32.0
+d 1
+illum 2
+
+newmtl landscape_tree_blossom
+Ka 0.200 0.200 0.200
+Kd 0.8 0.8 0.8
+Ks 0.100 0.100 0.100
+Ns 32.0
+d 1
+illum 2
+
+newmtl landscape_shrub
+Ka 0.200 0.200 0.200
+Kd 0.8 0.8 0.8
+Ks 0.100 0.100 0.100
+Ns 32.0
+d 1
+illum 2
+
+newmtl landscape_shrub_flowers
+Ka 0.200 0.200 0.200
+Kd 0.8 0.8 0.8
+Ks 0.100 0.100 0.100
+Ns 32.0
+d 1
+illum 2
+
+newmtl landscape_light_bollard
+Ka 0.200 0.200 0.200
+Kd 0.8 0.8 0.8
+Ks 0.100 0.100 0.100
+Ns 32.0
+d 1
+illum 2
+
+newmtl landscape_light_luminaire
+Ka 0.200 0.200 0.200
+Kd 0.8 0.8 0.8
+Ks 0.100 0.100 0.100
+Ns 32.0
+d 1
+illum 2
+

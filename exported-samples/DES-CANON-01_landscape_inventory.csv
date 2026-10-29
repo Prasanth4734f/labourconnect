@@ -1,0 +1,6 @@
+Feature ID,Category,Description,"Position (X, Y)",Dimensions (W × L),Quantity,Unit,Regional Base Rate (INR),Subtotal Amount (INR)
+LAND-01,Perimeter Boundary,Brick Compound Wall (5ft high with concrete coping),"(0, 0)",Perimeter Span,140,Running Ft,1250,175000
+LAND-02,Entrance Access,Main MS Gate with Symmetrical Masonry Gate Pillars,"(10, 0)",12' × 6',1,Set,45000,45000
+LAND-03,Pedestrian Pathway,Interlocking Paver Block Entrance Pathway,"(10, 2)",4' × 15',60,Sq.Ft,120,7200
+LAND-04,Softscape Horticulture,Evergreen Shade Trees & Flowering Perimeter Shrubs,"(2, 2)",Plot Margins,8,Nos,2200,17600
+LAND-05,Outdoor Living Patio,"Outdoor Dining Table, 4 Chairs & Planter Boxes","(20, 5)",8' × 8',1,Set,32000,32000

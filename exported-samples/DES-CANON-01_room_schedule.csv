@@ -1,0 +1,5 @@
+Mark,Space Description,Room Type,Floor Level,Width (ft),Length (ft),Width (m),Length (m),Carpet Area (sq.ft),Carpet Area (sq.m),Natural Ventilation (NBC 2016),Attached Bath
+R-1,Living Room,living,Ground Floor,14,16,4.27,4.88,224,20.81,Natural Daylight,No
+R-2,Kitchen,kitchen,Ground Floor,8,10,2.44,3.05,80,7.43,Natural Daylight,No
+R-3,Dining Room,dining,Ground Floor,8,8,2.44,2.44,64,5.95,Natural Daylight,No
+R-4,Master Bedroom,bedroom,Ground Floor,12,14,3.66,4.27,168,15.61,Natural Daylight,No

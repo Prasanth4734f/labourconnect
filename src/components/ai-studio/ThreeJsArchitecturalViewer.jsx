@@ -104,7 +104,7 @@ const ThreeJsArchitecturalViewer = forwardRef(function ThreeJsArchitecturalViewe
   showRoomLabels = false, // Clean unobstructed photorealistic view like Image 5
   renderingStyle = 'photorealistic', // 'photorealistic' | 'blueprint' | 'minimalist' | 'artistic' | 'wireframe'
   viewAngle = 'birds_eye', // 'birds_eye' | 'top_down' | 'isometric' | 'walkthrough' | 'exterior'
-  backgroundMode = 'isolated_white', // 'isolated_white' | 'neighborhood' | 'garden' | 'seaside'
+  backgroundMode = 'garden', // 'garden' | 'neighborhood' | 'isolated_white' | 'seaside'
   technicalPlan = null, // null | 'electrical' | 'plumbing' | 'lighting'
   onSnapshot
 }, ref) {
@@ -766,7 +766,7 @@ const ThreeJsArchitecturalViewer = forwardRef(function ThreeJsArchitecturalViewe
     }
 
     if (siteGroupRef.current) {
-      siteGroupRef.current.visible = (backgroundModeRef.current !== 'isolated_white' && viewMode === 'complete_home');
+      siteGroupRef.current.visible = (backgroundModeRef.current !== 'isolated_white');
     }
     if (sceneRef.current) {
       const bg = backgroundModeRef.current || backgroundMode;
@@ -930,7 +930,7 @@ const ThreeJsArchitecturalViewer = forwardRef(function ThreeJsArchitecturalViewe
     // Populates detailed models with contoured cushions, beveled frames, real fan blades,
     // and physical fixtures, replacing primitive rectangular boxes.
     // =========================================================================
-    if (furnitureGroupRef.current && (viewMode === 'infrastructure' || viewMode === 'furniture' || Boolean(activeRoom))) {
+    if (furnitureGroupRef.current) {
       let itemsToPlace = design?.interiorFurnishings?.allFurnitureItems;
       if (!itemsToPlace || itemsToPlace.length === 0) {
         try {
@@ -950,7 +950,10 @@ const ThreeJsArchitecturalViewer = forwardRef(function ThreeJsArchitecturalViewe
 
         try {
           const model = buildRealisticModel(item.type, item.dimensions, archStyle);
-          model.position.set(item.position.x, item.position.y, item.position.z);
+          // Correct floor elevation Y: Finished Floor Level sits directly on top of 1.5 ft plinth slab (never sunken)
+          const fIdx = item.floorIndex !== undefined ? Number(item.floorIndex) : 0;
+          const correctFloorY = 1.5 + fIdx * 10.5 + 0.04;
+          model.position.set(item.position.x, correctFloorY, item.position.z);
           model.rotation.y = -(item.rotation * Math.PI) / 180;
           model.userData = { isFurniture: true, item, id: item.id };
           model.traverse(ch => {
@@ -1113,9 +1116,9 @@ const ThreeJsArchitecturalViewer = forwardRef(function ThreeJsArchitecturalViewe
         if (isRoof) {
           isVisible = false; // Cutaway roof reveals complete infrastructure
         } else if (isWall) {
-          // Clean architectural matte grey plaster with smooth coping (Image 5 standard)
-          overrideColor = '#cbd5e1';
-          overrideRoughness = 0.82;
+          // Warm architectural off-white plaster with subtle stipple bump
+          overrideColor = isVintageOrTraditional ? '#fefbf6' : '#f8fafc';
+          overrideRoughness = 0.88;
           overrideMetalness = 0.02;
           usePlasterBump = true;
 
@@ -1385,23 +1388,32 @@ const ThreeJsArchitecturalViewer = forwardRef(function ThreeJsArchitecturalViewe
         const finalTransparent = forceOpaque ? false : overrideTransparent;
         const finalOpacity = forceOpaque ? 1.0 : overrideOpacity;
 
-        material = new THREE.MeshStandardMaterial({
-          color: new THREE.Color(overrideColor),
-          map: assignedMap,
-          roughnessMap: assignedRoughnessMap,
-          roughness: assignedRoughnessMap ? 0.45 : overrideRoughness,
-          metalness: overrideMetalness,
-          transparent: finalTransparent,
-          opacity: finalOpacity,
-          wireframe: overrideWireframe,
-          side: THREE.DoubleSide,
-          emissive: new THREE.Color(overrideEmissive),
-          emissiveIntensity: overrideEmissiveIntensity,
-          bumpMap: usePlasterBump ? getPlasterBumpMap() : null,
-          bumpScale: 0.015,
-          depthWrite: !finalTransparent,
-          depthTest: true
-        });
+        if (isGlassComponent && isPhotoreal) {
+          material = createArchitecturalGlassMaterial({
+            color: '#e0f2fe',
+            transmission: 0.94,
+            roughness: 0.04,
+            metalness: 0.08
+          });
+        } else {
+          material = new THREE.MeshStandardMaterial({
+            color: new THREE.Color(overrideColor),
+            map: assignedMap,
+            roughnessMap: assignedRoughnessMap,
+            roughness: assignedRoughnessMap ? 0.45 : overrideRoughness,
+            metalness: overrideMetalness,
+            transparent: finalTransparent,
+            opacity: finalOpacity,
+            wireframe: overrideWireframe,
+            side: THREE.DoubleSide,
+            emissive: new THREE.Color(overrideEmissive),
+            emissiveIntensity: overrideEmissiveIntensity,
+            bumpMap: usePlasterBump ? getPlasterBumpMap() : null,
+            bumpScale: 0.015,
+            depthWrite: !finalTransparent,
+            depthTest: true
+          });
+        }
       }
 
       const threeMesh = new THREE.Mesh(geometry, material);

@@ -24,6 +24,7 @@ import ThreeJsArchitecturalViewer from './ThreeJsArchitecturalViewer';
 import { simplifyRoomName } from './architecturalRoomUtils.js';
 import { buildProcedural3dGeometry } from '../../engine/geometry/procedural3dGenerator.js';
 import { generateLayoutCandidate } from '../../engine/generator/layoutGenerator.js';
+import { calculateProjectBudget } from '../../engine/estimation/projectBudgetEngine.js';
 
 const RENDERING_STYLES = [
   {
@@ -262,7 +263,7 @@ export default function Interactive3dEngine({
   // Architectural Visualizer Dropdown Controls matching User Reference Images
   const [renderingStyle, setRenderingStyle] = useState('photorealistic'); // 'photorealistic' | 'blueprint' | 'minimalist' | 'artistic' | 'wireframe'
   const [viewAngle, setViewAngle] = useState('birds_eye'); // 'birds_eye' | 'top_down' | 'isometric' | 'walkthrough' | 'exterior'
-  const [backgroundMode, setBackgroundMode] = useState('isolated_white'); // 'isolated_white' | 'neighborhood' | 'garden' | 'seaside'
+  const [backgroundMode, setBackgroundMode] = useState('garden'); // 'garden' | 'neighborhood' | 'isolated_white' | 'seaside'
   const [technicalPlan, setTechnicalPlan] = useState(null); // null | 'electrical' | 'plumbing' | 'lighting'
   const [activeDropdown, setActiveDropdown] = useState(null); // null | 'style' | 'angle' | 'background'
   const [isSettingsPanelOpen, setIsSettingsPanelOpen] = useState(true);
@@ -424,10 +425,29 @@ export default function Interactive3dEngine({
     return rooms;
   }, [targetDesign, activeFloorFilter]);
 
-  // Divided Budget: Civil Core Construction vs Infrastructure Fit-Out
-  const totalBudget = Number(budgetInr) || 4500000;
-  const coreBuildingBudget = totalBudget * 0.68;
-  const infraBudget = totalBudget * 0.32;
+  // Real Calculated Project Construction & Fit-Out Budget (Engineering-Grade Rate Engine)
+  const calculatedBudget = useMemo(() => {
+    if (!targetDesign) return null;
+    try {
+      return calculateProjectBudget(targetDesign, {
+        city: targetDesign.inputs?.city || 'Chennai',
+        targetBudget: Number(budgetInr) || 4500000
+      });
+    } catch (e) {
+      return null;
+    }
+  }, [targetDesign, budgetInr]);
+
+  const realisticTotalCost = calculatedBudget?.totalEstimatedCost || 9275000;
+  const costPerSqft = calculatedBudget?.costPerSqft || 2750;
+  const civilCoreCost = calculatedBudget?.categorySubtotals?.find(c => c.categoryId === 'civil_structure')?.subtotalInr || (realisticTotalCost * 0.345);
+  const finishesMepCost = (calculatedBudget?.categorySubtotals?.find(c => c.categoryId === 'architectural_finishes')?.subtotalInr || 0) +
+                          (calculatedBudget?.categorySubtotals?.find(c => c.categoryId === 'electrical_plumbing')?.subtotalInr || 0);
+  const interiorCost = (calculatedBudget?.categorySubtotals?.find(c => c.categoryId === 'interior_furnishings')?.subtotalInr || 0) +
+                       (calculatedBudget?.categorySubtotals?.find(c => c.categoryId === 'kitchen_bathroom_fittings')?.subtotalInr || 0);
+  const userTargetBudget = Number(budgetInr) || 4500000;
+  const isOverBudget = realisticTotalCost > userTargetBudget;
+  const varianceLakhs = Math.abs(realisticTotalCost - userTargetBudget) / 100000;
 
   return (
     <div
@@ -872,19 +892,27 @@ export default function Interactive3dEngine({
             </span>
           </div>
 
-          {/* Divided Budget: Civil Core Construction vs Infrastructure Fit-Out */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', marginTop: '2px', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '4px' }}>
+          {/* Realistic Itemized Construction & Fit-Out Budget Breakdown */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '3px', marginTop: '2px', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '4px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px', fontSize: '0.68rem', color: '#cbd5e1' }}>
-              <span>🏛️ Core Building (Civil):</span>
-              <strong style={{ color: '#38bdf8' }}>₹{(coreBuildingBudget / 100000).toFixed(2)} Lakhs (68%)</strong>
+              <span>🏛️ Civil Structure & Shell:</span>
+              <strong style={{ color: '#38bdf8' }}>₹{(civilCoreCost / 100000).toFixed(2)}L</strong>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px', fontSize: '0.68rem', color: '#cbd5e1' }}>
-              <span>🛋️ Infrastructure & Fit-Out:</span>
-              <strong style={{ color: '#a78bfa' }}>₹{(infraBudget / 100000).toFixed(2)} Lakhs (32%)</strong>
+              <span>⚡ Finishes, MEP & HVAC:</span>
+              <strong style={{ color: '#38bdf8' }}>₹{(finishesMepCost / 100000).toFixed(2)}L</strong>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px', fontSize: '0.70rem', color: '#ffffff', fontWeight: 700 }}>
-              <span>💰 Total Estimated Budget:</span>
-              <span style={{ color: '#34d399' }}>₹{(totalBudget / 100000).toFixed(2)} Lakhs</span>
+            <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px', fontSize: '0.68rem', color: '#cbd5e1' }}>
+              <span>🛋️ Interior Fit-Out & Furniture:</span>
+              <strong style={{ color: '#a78bfa' }}>₹{(interiorCost / 100000).toFixed(2)}L</strong>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px', fontSize: '0.72rem', color: '#ffffff', fontWeight: 800, marginTop: '2px', borderTop: '1px dashed rgba(255,255,255,0.15)', paddingTop: '3px' }}>
+              <span>💰 Realistic Total Construction:</span>
+              <span style={{ color: '#34d399' }}>₹{(realisticTotalCost / 100000).toFixed(2)} Lakhs (₹{costPerSqft}/sq.ft)</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', gap: '8px', fontSize: '0.64rem', color: isOverBudget ? '#f87171' : '#4ade80' }}>
+              <span>Target: ₹{(userTargetBudget / 100000).toFixed(1)}L</span>
+              <span>{isOverBudget ? `⚠️ Over Budget by ₹${varianceLakhs.toFixed(2)}L` : '✅ Within Budget'}</span>
             </div>
           </div>
 

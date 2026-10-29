@@ -11,6 +11,8 @@ import { generateBlenderCyclesPythonScript } from '../export/blenderCyclesExport
 import { exportDesignArtifact, EXPORT_FORMATS } from '../export/exportPipelineOrchestrator.js';
 import { generateLayoutCandidate } from '../generator/layoutGenerator.js';
 import { ARCHITECTURAL_MATERIALS, MATERIAL_KEYS } from '../rendering/materialCatalog.js';
+import { ARCHITECTURAL_ASSETS, ASSET_CATEGORIES, getAssetDefinitionForType } from '../interior/assetLibrary.js';
+import { buildRealisticModel } from '../interior/assetLoaderService.js';
 
 export function runPhotorealisticEngineTests() {
   console.log('======================================================================');
@@ -77,6 +79,49 @@ export function runPhotorealisticEngineTests() {
 
   const glassMat = ARCHITECTURAL_MATERIALS[MATERIAL_KEYS.GLASS_ACOUSTIC_TINTED];
   assert(glassMat && glassMat.category === 'glass' && glassMat.roughness <= 0.15, 'Test 3.3: Float glass has physical smoothness');
+
+  // Section 4: Architectural Asset Library Registry & Synthesis
+  console.log('\n--- Section 4: Architectural Asset Library Registry & Synthesis ---');
+  const assetKeys = Object.keys(ARCHITECTURAL_ASSETS);
+  assert(assetKeys.length >= 15, `Test 4.1: Asset registry contains >= 15 production assets (found ${assetKeys.length})`);
+
+  const categories = new Set(Object.values(ARCHITECTURAL_ASSETS).map(a => a.category));
+  assert(categories.has(ASSET_CATEGORIES.LIVING), 'Test 4.2: Living room assets registered');
+  assert(categories.has(ASSET_CATEGORIES.BEDROOM), 'Test 4.3: Bedroom assets registered');
+  assert(categories.has(ASSET_CATEGORIES.DINING), 'Test 4.4: Dining assets registered');
+  assert(categories.has(ASSET_CATEGORIES.KITCHEN), 'Test 4.5: Kitchen assets registered');
+  assert(categories.has(ASSET_CATEGORIES.BATHROOM), 'Test 4.6: Bathroom assets registered');
+  assert(categories.has(ASSET_CATEGORIES.LIGHTING), 'Test 4.7: Lighting assets registered');
+  assert(categories.has(ASSET_CATEGORIES.PLANTS), 'Test 4.8: Plant/Decor assets registered');
+
+  // Verify getAssetDefinitionForType
+  const sofaDef = getAssetDefinitionForType('sofa_3seater');
+  assert(sofaDef && sofaDef.furnitureType === 'sofa_3seater', 'Test 4.9: getAssetDefinitionForType resolves sofa definition');
+  assert(sofaDef.dimensions && sofaDef.dimensions.width > 0, 'Test 4.10: Asset definition contains physical dimensions');
+
+  // Verify buildRealisticModel for key furniture items
+  const realisticSofa = buildRealisticModel('sofa_3seater', { width: 7.2, depth: 3.2, height: 2.8 }, 'contemporary');
+  assert(realisticSofa && realisticSofa.isGroup, 'Test 4.11: Sofa synthesized as Three.js Group');
+  assert(realisticSofa.children.length >= 4, `Test 4.12: Sofa composed of compound parts (found ${realisticSofa.children.length} meshes)`);
+
+  let allOpaque = true;
+  realisticSofa.traverse(child => {
+    if (child.isMesh && child.material) {
+      if (child.material.transparent === true && child.material.opacity < 0.99) {
+        allOpaque = false;
+      }
+    }
+  });
+  assert(allOpaque, 'Test 4.13: Sofa materials are 100% solid opaque (no transparency/ghosting)');
+
+  const realisticBed = buildRealisticModel('bed_king', { width: 6.5, depth: 7.0, height: 4.0 }, 'vintage');
+  assert(realisticBed && realisticBed.isGroup && realisticBed.children.length >= 4, 'Test 4.14: King bed synthesized with headboard, mattress, and pillows');
+
+  const realisticFan = buildRealisticModel('ceiling_fan', { width: 4.0, depth: 4.0, height: 1.5 });
+  assert(realisticFan && realisticFan.children.length >= 3, 'Test 4.15: Ceiling fan synthesized with motor housing, downrod, and blades');
+
+  const realisticToilet = buildRealisticModel('toilet', { width: 1.8, depth: 2.5, height: 2.5 });
+  assert(realisticToilet && realisticToilet.children.length >= 2, 'Test 4.16: Bathroom toilet synthesized with bowl and flush tank');
 
   console.log('======================================================================');
   console.log(`📊 PHOTOREALISTIC ENGINE SUMMARY: ${passed} PASSED, ${failed} FAILED`);

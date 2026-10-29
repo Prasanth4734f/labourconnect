@@ -19,6 +19,8 @@ import {
   createArchitecturalGlassMaterial
 } from './architecturalMaterialSystem.js';
 import { simplifyRoomName } from './architecturalRoomUtils.js';
+import { buildRealisticModel } from '../../engine/interior/assetLoaderService.js';
+import { generateDesignFurniture } from '../../engine/interior/proceduralFurnitureGenerator.js';
 
 /**
  * ThreeJsArchitecturalViewer
@@ -114,6 +116,8 @@ const ThreeJsArchitecturalViewer = forwardRef(function ThreeJsArchitecturalViewe
   const hemiLightRef = useRef(null);
   const fillLightRef = useRef(null);
   const houseGroupRef = useRef(null);
+  const furnitureGroupRef = useRef(null);
+  const selectionGroupRef = useRef(null);
   const roomFinishesGroupRef = useRef(null);
   const interiorLightsGroupRef = useRef(null);
   const siteGroupRef = useRef(null);
@@ -128,6 +132,10 @@ const ThreeJsArchitecturalViewer = forwardRef(function ThreeJsArchitecturalViewe
   const viewAngleRef = useRef(viewAngle);
   const backgroundModeRef = useRef(backgroundMode);
   const technicalPlanRef = useRef(technicalPlan);
+
+  // Interactive selected furniture state
+  const [selectedFurniture, setSelectedFurniture] = useState(null);
+  const selectedObjectRef = useRef(null);
 
   // Screen projected room labels state
   const [hudLabels, setHudLabels] = useState([]);
@@ -537,6 +545,66 @@ const ThreeJsArchitecturalViewer = forwardRef(function ThreeJsArchitecturalViewe
     shadowPlane.receiveShadow = true;
     scene.add(shadowPlane);
 
+    // 10. Realistic Architectural Furniture Group
+    const furnitureGroup = new THREE.Group();
+    scene.add(furnitureGroup);
+    furnitureGroupRef.current = furnitureGroup;
+
+    // 11. Interactive Selection Wireframe Outline Group
+    const selectionGroup = new THREE.Group();
+    scene.add(selectionGroup);
+    selectionGroupRef.current = selectionGroup;
+
+    // Interactive Raycasting Pointer Listener for Furniture Selection
+    const handleCanvasPointerDown = (event) => {
+      if (event.button !== 0 || !mountRef.current || !cameraRef.current || !furnitureGroupRef.current) return;
+      const rect = mountRef.current.getBoundingClientRect();
+      const mouse = new THREE.Vector2(
+        ((event.clientX - rect.left) / rect.width) * 2 - 1,
+        -((event.clientY - rect.top) / rect.height) * 2 + 1
+      );
+
+      const raycaster = new THREE.Raycaster();
+      raycaster.setFromCamera(mouse, cameraRef.current);
+
+      const candidates = [];
+      furnitureGroupRef.current.traverse(ch => {
+        if (ch.isMesh && ch.userData?.isFurniture) {
+          candidates.push(ch);
+        }
+      });
+
+      const intersects = raycaster.intersectObjects(candidates, true);
+      if (intersects.length > 0) {
+        let hitObj = intersects[0].object;
+        while (hitObj && !hitObj.userData?.item && hitObj.parent && hitObj.parent !== furnitureGroupRef.current) {
+          hitObj = hitObj.parent;
+        }
+        if (hitObj && hitObj.userData?.item) {
+          setSelectedFurniture(hitObj.userData.item);
+          selectedObjectRef.current = hitObj;
+
+          if (selectionGroupRef.current) {
+            while (selectionGroupRef.current.children.length > 0) {
+              selectionGroupRef.current.remove(selectionGroupRef.current.children[0]);
+            }
+            const boxHelper = new THREE.BoxHelper(hitObj, '#38bdf8');
+            selectionGroupRef.current.add(boxHelper);
+          }
+          return;
+        }
+      }
+      setSelectedFurniture(null);
+      selectedObjectRef.current = null;
+      if (selectionGroupRef.current) {
+        while (selectionGroupRef.current.children.length > 0) {
+          selectionGroupRef.current.remove(selectionGroupRef.current.children[0]);
+        }
+      }
+    };
+
+    container.addEventListener('pointerdown', handleCanvasPointerDown);
+
     // Animation & Projection Loop
     let animId = null;
     const tempVec = new THREE.Vector3();
@@ -617,6 +685,7 @@ const ThreeJsArchitecturalViewer = forwardRef(function ThreeJsArchitecturalViewe
     return () => {
       cancelAnimationFrame(animId);
       resizeObserver.disconnect();
+      container.removeEventListener('pointerdown', handleCanvasPointerDown);
       if (renderer.domElement && container.contains(renderer.domElement)) {
         container.removeChild(renderer.domElement);
       }
@@ -678,6 +747,19 @@ const ThreeJsArchitecturalViewer = forwardRef(function ThreeJsArchitecturalViewe
     if (interiorGroup) {
       while (interiorGroup.children.length > 0) {
         interiorGroup.remove(interiorGroup.children[0]);
+      }
+    }
+
+    if (furnitureGroupRef.current) {
+      while (furnitureGroupRef.current.children.length > 0) {
+        const child = furnitureGroupRef.current.children[0];
+        furnitureGroupRef.current.remove(child);
+      }
+    }
+
+    if (selectionGroupRef.current) {
+      while (selectionGroupRef.current.children.length > 0) {
+        selectionGroupRef.current.remove(selectionGroupRef.current.children[0]);
       }
     }
 
@@ -842,6 +924,48 @@ const ThreeJsArchitecturalViewer = forwardRef(function ThreeJsArchitecturalViewe
     }
 
     // =========================================================================
+    // REALISTIC ARCHITECTURAL 3D ASSETS INJECTION
+    // Populates detailed models with contoured cushions, beveled frames, real fan blades,
+    // and physical fixtures, replacing primitive rectangular boxes.
+    // =========================================================================
+    if (furnitureGroupRef.current && (viewMode === 'infrastructure' || viewMode === 'furniture' || Boolean(activeRoom))) {
+      let itemsToPlace = design?.interiorFurnishings?.allFurnitureItems;
+      if (!itemsToPlace || itemsToPlace.length === 0) {
+        try {
+          const fitout = generateDesignFurniture(design);
+          itemsToPlace = fitout.allFurnitureItems || [];
+        } catch (e) {
+          itemsToPlace = [];
+        }
+      }
+
+      const targetFl = activeFloorFilter === 'all' ? null : Number(activeFloorFilter);
+      const archStyle = design?.inputs?.archStyle || design?.metadata?.style || 'contemporary';
+
+      (itemsToPlace || []).forEach(item => {
+        if (targetFl !== null && item.floorIndex !== targetFl) return;
+        if (activeRoom && item.roomId !== activeRoom.id) return;
+
+        try {
+          const model = buildRealisticModel(item.type, item.dimensions, archStyle);
+          model.position.set(item.position.x, item.position.y, item.position.z);
+          model.rotation.y = -(item.rotation * Math.PI) / 180;
+          model.userData = { isFurniture: true, item, id: item.id };
+          model.traverse(ch => {
+            if (ch.isMesh) {
+              ch.userData = { isFurniture: true, item, id: item.id };
+              ch.castShadow = true;
+              ch.receiveShadow = true;
+            }
+          });
+          furnitureGroupRef.current.add(model);
+        } catch (e) {
+          console.warn('[ThreeJsArchitecturalViewer] Error creating realistic model:', item.type, e);
+        }
+      });
+    }
+
+    // =========================================================================
     // 3D MODEL MESH GENERATION & VIEW MODE MATERIAL ASSIGNMENT
     // =========================================================================
     meshes.forEach((mesh) => {
@@ -854,6 +978,11 @@ const ThreeJsArchitecturalViewer = forwardRef(function ThreeJsArchitecturalViewe
       const isLandscape = Boolean(mesh.isLandscape || mesh.metadata?.isLandscape);
       const isColumn = compType.includes('column') || compType.includes('pillar');
       const isPergola = compType.includes('pergola') || compType.includes('porch');
+
+      // If realistic models are loaded in furnitureGroup, skip rendering the low-poly box mesh!
+      if (isFurniture && furnitureGroupRef.current && furnitureGroupRef.current.children.length > 0) {
+        return;
+      }
 
       // -----------------------------------------------------------------------
       // FLOOR-BY-FLOOR INSPECTION FILTERING (Attached Building Base)
@@ -940,8 +1069,7 @@ const ThreeJsArchitecturalViewer = forwardRef(function ThreeJsArchitecturalViewe
           // Controlled cutaway for front/intervening walls when inspecting room interior
           if (activeRoom) {
             if (cutaway.shouldCutaway) {
-              overrideTransparent = true;
-              overrideOpacity = 0.10;
+              isVisible = false; // Completely hide obstructing wall to prevent transparent ghosting
             } else if (cutaway.isOpaqueFramingWall) {
               overrideTransparent = false;
               overrideOpacity = 1.0;
@@ -992,8 +1120,7 @@ const ThreeJsArchitecturalViewer = forwardRef(function ThreeJsArchitecturalViewe
           // Controlled cutaway for front/intervening walls when inspecting room interior
           if (activeRoom) {
             if (cutaway.shouldCutaway) {
-              overrideTransparent = true;
-              overrideOpacity = 0.10;
+              isVisible = false; // Completely hide obstructing wall to prevent transparent ghosting
             } else if (cutaway.isOpaqueFramingWall) {
               overrideTransparent = false;
               overrideOpacity = 1.0;
@@ -1244,21 +1371,26 @@ const ThreeJsArchitecturalViewer = forwardRef(function ThreeJsArchitecturalViewe
           }
         }
 
+        const forceOpaque = isPhotoreal && !isGlassComponent;
+        const finalTransparent = forceOpaque ? false : overrideTransparent;
+        const finalOpacity = forceOpaque ? 1.0 : overrideOpacity;
+
         material = new THREE.MeshStandardMaterial({
           color: new THREE.Color(overrideColor),
           map: assignedMap,
           roughnessMap: assignedRoughnessMap,
           roughness: assignedRoughnessMap ? 0.45 : overrideRoughness,
           metalness: overrideMetalness,
-          transparent: overrideTransparent,
-          opacity: overrideOpacity,
+          transparent: finalTransparent,
+          opacity: finalOpacity,
           wireframe: overrideWireframe,
           side: THREE.DoubleSide,
           emissive: new THREE.Color(overrideEmissive),
           emissiveIntensity: overrideEmissiveIntensity,
           bumpMap: usePlasterBump ? getPlasterBumpMap() : null,
           bumpScale: 0.015,
-          depthWrite: (!overrideTransparent || overrideOpacity > 0.8) && !cutaway.shouldCutaway
+          depthWrite: !finalTransparent,
+          depthTest: true
         });
       }
 
@@ -1434,6 +1566,91 @@ const ThreeJsArchitecturalViewer = forwardRef(function ThreeJsArchitecturalViewe
           <span>{label.name}</span>
         </div>
       ))}
+      {/* Interactive Furniture Selection & Customization HUD */}
+      {selectedFurniture && (
+        <div
+          style={{
+            position: 'absolute',
+            bottom: '18px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            background: 'rgba(15, 23, 42, 0.92)',
+            backdropFilter: 'blur(12px)',
+            border: '1px solid rgba(56, 189, 248, 0.45)',
+            borderRadius: '16px',
+            padding: '10px 18px',
+            color: '#ffffff',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '16px',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.6)',
+            zIndex: 30
+          }}
+        >
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <div style={{ fontSize: '0.82rem', fontWeight: 800, color: '#38bdf8', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <span>🛋️</span> {selectedFurniture.name || selectedFurniture.type}
+            </div>
+            <div style={{ fontSize: '0.70rem', color: '#94a3b8' }}>
+              Dimensions: {selectedFurniture.dimensions?.width}ft (W) × {selectedFurniture.dimensions?.depth}ft (D) × {selectedFurniture.dimensions?.height}ft (H)
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <button
+              onClick={() => {
+                if (selectedObjectRef.current) {
+                  selectedObjectRef.current.rotation.y += Math.PI / 2;
+                  if (selectionGroupRef.current) {
+                    while (selectionGroupRef.current.children.length > 0) selectionGroupRef.current.remove(selectionGroupRef.current.children[0]);
+                    const boxHelper = new THREE.BoxHelper(selectedObjectRef.current, '#38bdf8');
+                    selectionGroupRef.current.add(boxHelper);
+                  }
+                }
+              }}
+              style={{
+                padding: '6px 12px',
+                borderRadius: '8px',
+                background: '#1e293b',
+                border: '1px solid #334155',
+                color: '#e2e8f0',
+                fontSize: '0.74rem',
+                fontWeight: 700,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '5px'
+              }}
+              title="Rotate Furniture 90°"
+            >
+              🔄 Rotate 90°
+            </button>
+
+            <button
+              onClick={() => {
+                setSelectedFurniture(null);
+                selectedObjectRef.current = null;
+                if (selectionGroupRef.current) {
+                  while (selectionGroupRef.current.children.length > 0) selectionGroupRef.current.remove(selectionGroupRef.current.children[0]);
+                }
+              }}
+              style={{
+                padding: '6px 10px',
+                borderRadius: '8px',
+                background: 'rgba(239, 68, 68, 0.2)',
+                border: '1px solid rgba(239, 68, 68, 0.4)',
+                color: '#f87171',
+                fontSize: '0.74rem',
+                fontWeight: 800,
+                cursor: 'pointer'
+              }}
+              title="Deselect"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 });

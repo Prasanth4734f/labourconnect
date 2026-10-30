@@ -1,0 +1,2460 @@
+[
+  {
+    "id": 1,
+    "name": "Modern Contemporary Duplex Villa",
+    "city": "Bangalore",
+    "plot": "30x40 ft (1,200 sq.ft)",
+    "style": "Modern Contemporary",
+    "prompt": "Design a modern 3BHK duplex house on a 30x40 ft plot, facing North, with car parking, pooja room, modular kitchen, and balcony. Location Bangalore, budget 75 lakhs.",
+    "success": true,
+    "elapsedMs": 95,
+    "designCode": "LC-12026",
+    "title": "Modern 3BHK (OPEN CONTEMPORARY)",
+    "inputsParsed": {
+      "bhk": 3,
+      "floors": 2,
+      "plotFacing": "North",
+      "archStyle": "modern",
+      "plotWidthFt": 30,
+      "plotLengthFt": 40,
+      "plotAreaSqft": 1200,
+      "city": "Bangalore"
+    },
+    "spatialMetrics": {
+      "plotAreaSqft": 1200,
+      "buildingFootprintSqft": 875,
+      "builtUpAreaSqft": 2380,
+      "carpetAreaSqft": 2069,
+      "carpetEfficiencyPct": 86.9,
+      "groundCoverageRatioPct": 73,
+      "fsiAchieved": 1.98,
+      "totalRooms": 18,
+      "bedrooms": 3,
+      "bathrooms": 3
+    },
+    "floors": [
+      {
+        "floorIndex": 0,
+        "floorName": "Ground Floor",
+        "roomsCount": 9,
+        "rooms": [
+          {
+            "name": "Covered Car Porch & Portico",
+            "type": "portico",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Grand Entrance Foyer & Verandah",
+            "type": "foyer",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "RCC Dog-Legged Stairwell",
+            "type": "stairwell",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Formal Living Lounge",
+            "type": "living",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Central Dining Area",
+            "type": "dining",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Ishanya Pooja Sanctum",
+            "type": "pooja",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Modular Gourmet Kitchen",
+            "type": "kitchen",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Sanitary Bath & Toilet",
+            "type": "bathroom",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Ground Bedroom Suite",
+            "type": "bedroom",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          }
+        ]
+      },
+      {
+        "floorIndex": 1,
+        "floorName": "First Floor",
+        "roomsCount": 7,
+        "rooms": [
+          {
+            "name": "Cantilever Glass Balcony Deck",
+            "type": "balcony",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Family Media Lounge & Library",
+            "type": "living",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "RCC Dog-Legged Stairwell (Upper)",
+            "type": "stairwell",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Master Penthouse Suite",
+            "type": "master_bedroom",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Master En-suite Spa Bath",
+            "type": "bathroom",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Bedroom 2 Attached Bath",
+            "type": "bathroom",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Children / Guest Bedroom Suite",
+            "type": "bedroom",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          }
+        ]
+      },
+      {
+        "floorIndex": 2,
+        "floorName": "Terrace / Mumty",
+        "roomsCount": 2,
+        "rooms": [
+          {
+            "name": "Stairhead Mumty & Lift Machine",
+            "type": "stairwell",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Solar Pergola Terrace Garden",
+            "type": "terrace",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          }
+        ]
+      }
+    ],
+    "interiorFitout": {
+      "totalFurnitureItems": 56,
+      "furnishedRoomsCount": 14,
+      "furnitureCostInr": 938500,
+      "furnitureCostLakhs": 9.38
+    },
+    "geometry3d": {
+      "meshCount": 494,
+      "hasRoofline": true,
+      "hasPhysicalGlass": true,
+      "hasWallSkirting": true
+    },
+    "budgetEstimate": {
+      "cityUsed": "Bengaluru",
+      "targetBudgetInr": 7500000,
+      "targetBudgetLakhs": 75,
+      "totalEstimatedCostInr": 7933768,
+      "totalEstimatedCostLakhs": 79.34,
+      "costPerSqft": 3334,
+      "varianceLakhs": 4.34,
+      "status": "OVER_BUDGET",
+      "civilCoreLakhs": 23.04,
+      "finishesMepLakhs": 20.19,
+      "interiorFurnishingLakhs": 11.36,
+      "categories": [
+        {
+          "id": "site_preparation",
+          "costInr": 269820,
+          "costLakhs": 2.7
+        },
+        {
+          "id": "civil_structure",
+          "costInr": 2304290,
+          "costLakhs": 23.04
+        },
+        {
+          "id": "architectural_finishes",
+          "costInr": 1308648,
+          "costLakhs": 13.09
+        },
+        {
+          "id": "electrical_plumbing",
+          "costInr": 710500,
+          "costLakhs": 7.11
+        },
+        {
+          "id": "kitchen_bathroom_fittings",
+          "costInr": 197750,
+          "costLakhs": 1.98
+        },
+        {
+          "id": "interior_furnishings",
+          "costInr": 938500,
+          "costLakhs": 9.38
+        },
+        {
+          "id": "landscaping_outdoor",
+          "costInr": 403942,
+          "costLakhs": 4.04
+        },
+        {
+          "id": "professional_statutory_fees",
+          "costInr": 343300,
+          "costLakhs": 3.43
+        },
+        {
+          "id": "taxes_transport_installation",
+          "costInr": 938877,
+          "costLakhs": 9.39
+        },
+        {
+          "id": "contingency_escalation",
+          "costInr": 518141,
+          "costLakhs": 5.18
+        }
+      ]
+    },
+    "complianceAndQuality": {
+      "overallQualityScore": 90,
+      "vaastuScore": 100,
+      "circulationScore": 100,
+      "daylightScore": 81,
+      "structuralScore": 95,
+      "hardConstraintsPassed": true,
+      "zeroOverlaps": true,
+      "boundaryContained": true,
+      "checksPerformedCount": 27
+    }
+  },
+  {
+    "id": 2,
+    "name": "Kerala Traditional Courtyard Villa",
+    "city": "Kochi",
+    "plot": "40x60 ft (2,400 sq.ft)",
+    "style": "Traditional Kerala / Vintage",
+    "prompt": "Construct a traditional Kerala vintage 4BHK villa on a 40x60 ft plot, East facing, with central courtyard, sloping terracotta roof, timber verandas, and 4 bathrooms in Kochi. Budget 95 lakhs.",
+    "success": true,
+    "elapsedMs": 12,
+    "designCode": "LC-12123",
+    "title": "Vintage 4BHK (OPEN CONTEMPORARY)",
+    "inputsParsed": {
+      "bhk": 4,
+      "floors": 2,
+      "plotFacing": "North",
+      "archStyle": "vintage",
+      "plotWidthFt": 40,
+      "plotLengthFt": 60,
+      "plotAreaSqft": 2400,
+      "city": "Kochi"
+    },
+    "spatialMetrics": {
+      "plotAreaSqft": 2400,
+      "buildingFootprintSqft": 1205,
+      "builtUpAreaSqft": 2413,
+      "carpetAreaSqft": 2098,
+      "carpetEfficiencyPct": 86.9,
+      "groundCoverageRatioPct": 50,
+      "fsiAchieved": 1.01,
+      "totalRooms": 15,
+      "bedrooms": 4,
+      "bathrooms": 4
+    },
+    "floors": [
+      {
+        "floorIndex": 0,
+        "floorName": "Ground Floor",
+        "roomsCount": 9,
+        "rooms": [
+          {
+            "name": "Front Verandah & Sit-out",
+            "type": "foyer",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "RCC Dog-Legged Stairwell",
+            "type": "stairwell",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Formal Living Lounge",
+            "type": "living",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Central Thotti Courtyard",
+            "type": "courtyard",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Central Dining Area",
+            "type": "dining",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Modular Gourmet Kitchen",
+            "type": "kitchen",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Sanitary Bath & Powder",
+            "type": "bathroom",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Ground Suite En-suite Bath",
+            "type": "bathroom",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Ground Bedroom Suite",
+            "type": "bedroom",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          }
+        ]
+      },
+      {
+        "floorIndex": 1,
+        "floorName": "First Floor",
+        "roomsCount": 6,
+        "rooms": [
+          {
+            "name": "Family Media Lounge & Library",
+            "type": "living",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "RCC Dog-Legged Stairwell (Upper)",
+            "type": "stairwell",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Master Penthouse Suite",
+            "type": "master_bedroom",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Master En-suite Spa Bath",
+            "type": "bathroom",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Children Suite Bedroom 2",
+            "type": "bedroom",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Guest Bedroom 3",
+            "type": "bedroom",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          }
+        ]
+      }
+    ],
+    "interiorFitout": {
+      "totalFurnitureItems": 42,
+      "furnishedRoomsCount": 11,
+      "furnitureCostInr": 902500,
+      "furnitureCostLakhs": 9.03
+    },
+    "geometry3d": {
+      "meshCount": 456,
+      "hasRoofline": true,
+      "hasPhysicalGlass": true,
+      "hasWallSkirting": true
+    },
+    "budgetEstimate": {
+      "cityUsed": "Bengaluru",
+      "targetBudgetInr": 9500000,
+      "targetBudgetLakhs": 95,
+      "totalEstimatedCostInr": 8335335,
+      "totalEstimatedCostLakhs": 83.35,
+      "costPerSqft": 3454,
+      "varianceLakhs": -11.65,
+      "status": "WITHIN_BUDGET",
+      "civilCoreLakhs": 24.33,
+      "finishesMepLakhs": 20.31,
+      "interiorFurnishingLakhs": 11.42,
+      "categories": [
+        {
+          "id": "site_preparation",
+          "costInr": 378036,
+          "costLakhs": 3.78
+        },
+        {
+          "id": "civil_structure",
+          "costInr": 2432685,
+          "costLakhs": 24.33
+        },
+        {
+          "id": "architectural_finishes",
+          "costInr": 1311657,
+          "costLakhs": 13.12
+        },
+        {
+          "id": "electrical_plumbing",
+          "costInr": 719575,
+          "costLakhs": 7.2
+        },
+        {
+          "id": "kitchen_bathroom_fittings",
+          "costInr": 239550,
+          "costLakhs": 2.4
+        },
+        {
+          "id": "interior_furnishings",
+          "costInr": 902500,
+          "costLakhs": 9.03
+        },
+        {
+          "id": "landscaping_outdoor",
+          "costInr": 473203,
+          "costLakhs": 4.73
+        },
+        {
+          "id": "professional_statutory_fees",
+          "costInr": 347755,
+          "costLakhs": 3.48
+        },
+        {
+          "id": "taxes_transport_installation",
+          "costInr": 985977,
+          "costLakhs": 9.86
+        },
+        {
+          "id": "contingency_escalation",
+          "costInr": 544397,
+          "costLakhs": 5.44
+        }
+      ]
+    },
+    "complianceAndQuality": {
+      "overallQualityScore": 85,
+      "vaastuScore": 100,
+      "circulationScore": 100,
+      "daylightScore": 85,
+      "structuralScore": 95,
+      "hardConstraintsPassed": true,
+      "zeroOverlaps": true,
+      "boundaryContained": true,
+      "checksPerformedCount": 27
+    }
+  },
+  {
+    "id": 3,
+    "name": "Compact Urban Duplex Residence",
+    "city": "Chennai",
+    "plot": "25x40 ft (1,000 sq.ft)",
+    "style": "Modern Compact",
+    "prompt": "Design a compact 2BHK duplex home on a 25x40 ft plot in Chennai, South facing, with open kitchen, utility area, small garden, and covered bike parking. Budget 45 lakhs.",
+    "success": true,
+    "elapsedMs": 12,
+    "designCode": "LC-12842",
+    "title": "Modern 2BHK (VILLA PAVILION)",
+    "inputsParsed": {
+      "bhk": 2,
+      "floors": 2,
+      "plotFacing": "North",
+      "archStyle": "modern",
+      "plotWidthFt": 25,
+      "plotLengthFt": 40,
+      "plotAreaSqft": 1000,
+      "city": "Chennai"
+    },
+    "spatialMetrics": {
+      "plotAreaSqft": 1000,
+      "buildingFootprintSqft": 679,
+      "builtUpAreaSqft": 1832,
+      "carpetAreaSqft": 1593,
+      "carpetEfficiencyPct": 87,
+      "groundCoverageRatioPct": 68,
+      "fsiAchieved": 1.83,
+      "totalRooms": 15,
+      "bedrooms": 2,
+      "bathrooms": 2
+    },
+    "floors": [
+      {
+        "floorIndex": 0,
+        "floorName": "Ground Floor",
+        "roomsCount": 8,
+        "rooms": [
+          {
+            "name": "Covered Car Porch & Portico",
+            "type": "portico",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Grand Entrance Foyer & Verandah",
+            "type": "foyer",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "RCC Dog-Legged Stairwell",
+            "type": "stairwell",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Formal Living Lounge",
+            "type": "living",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Central Dining Area",
+            "type": "dining",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Modular Gourmet Kitchen",
+            "type": "kitchen",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Sanitary Bath & Toilet",
+            "type": "bathroom",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Master Suite",
+            "type": "bedroom",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          }
+        ]
+      },
+      {
+        "floorIndex": 1,
+        "floorName": "First Floor",
+        "roomsCount": 5,
+        "rooms": [
+          {
+            "name": "Family Media Lounge & Library",
+            "type": "living",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "RCC Dog-Legged Stairwell (Upper)",
+            "type": "stairwell",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Master Penthouse Suite",
+            "type": "master_bedroom",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Master En-suite Spa Bath",
+            "type": "bathroom",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Children / Study Bedroom Suite",
+            "type": "bedroom",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          }
+        ]
+      },
+      {
+        "floorIndex": 2,
+        "floorName": "Terrace / Mumty",
+        "roomsCount": 2,
+        "rooms": [
+          {
+            "name": "Stairhead Mumty & Lift Machine",
+            "type": "stairwell",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Solar Pergola Terrace Garden",
+            "type": "terrace",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          }
+        ]
+      }
+    ],
+    "interiorFitout": {
+      "totalFurnitureItems": 44,
+      "furnishedRoomsCount": 10,
+      "furnitureCostInr": 714500,
+      "furnitureCostLakhs": 7.14
+    },
+    "geometry3d": {
+      "meshCount": 422,
+      "hasRoofline": true,
+      "hasPhysicalGlass": true,
+      "hasWallSkirting": true
+    },
+    "budgetEstimate": {
+      "cityUsed": "Bengaluru",
+      "targetBudgetInr": 4500000,
+      "targetBudgetLakhs": 45,
+      "totalEstimatedCostInr": 6391202,
+      "totalEstimatedCostLakhs": 63.91,
+      "costPerSqft": 3489,
+      "varianceLakhs": 18.91,
+      "status": "OVER_BUDGET",
+      "civilCoreLakhs": 18.33,
+      "finishesMepLakhs": 15.81,
+      "interiorFurnishingLakhs": 8.7,
+      "categories": [
+        {
+          "id": "site_preparation",
+          "costInr": 266420,
+          "costLakhs": 2.66
+        },
+        {
+          "id": "civil_structure",
+          "costInr": 1833080,
+          "costLakhs": 18.33
+        },
+        {
+          "id": "architectural_finishes",
+          "costInr": 1021280,
+          "costLakhs": 10.21
+        },
+        {
+          "id": "electrical_plumbing",
+          "costInr": 559800,
+          "costLakhs": 5.6
+        },
+        {
+          "id": "kitchen_bathroom_fittings",
+          "costInr": 155950,
+          "costLakhs": 1.56
+        },
+        {
+          "id": "interior_furnishings",
+          "costInr": 714500,
+          "costLakhs": 7.14
+        },
+        {
+          "id": "landscaping_outdoor",
+          "costInr": 397342,
+          "costLakhs": 3.97
+        },
+        {
+          "id": "professional_statutory_fees",
+          "costInr": 269320,
+          "costLakhs": 2.69
+        },
+        {
+          "id": "taxes_transport_installation",
+          "costInr": 756094,
+          "costLakhs": 7.56
+        },
+        {
+          "id": "contingency_escalation",
+          "costInr": 417416,
+          "costLakhs": 4.17
+        }
+      ]
+    },
+    "complianceAndQuality": {
+      "overallQualityScore": 91,
+      "vaastuScore": 91,
+      "circulationScore": 100,
+      "daylightScore": 81,
+      "structuralScore": 95,
+      "hardConstraintsPassed": true,
+      "zeroOverlaps": true,
+      "boundaryContained": true,
+      "checksPerformedCount": 27
+    }
+  },
+  {
+    "id": 4,
+    "name": "Luxury Contemporary Executive Villa",
+    "city": "Hyderabad",
+    "plot": "40x50 ft (2,000 sq.ft)",
+    "style": "Luxury Modern Contemporary",
+    "prompt": "Create a luxury modern contemporary 4BHK duplex on a 40x50 ft plot in Hyderabad, West facing, with double-height living room, family lounge, home office, and terrace garden. Budget 1.2 crore.",
+    "success": true,
+    "elapsedMs": 9,
+    "designCode": "LC-12317",
+    "title": "Luxury villa 4BHK (OPEN CONTEMPORARY)",
+    "inputsParsed": {
+      "bhk": 4,
+      "floors": 2,
+      "plotFacing": "North",
+      "archStyle": "luxury_villa",
+      "plotWidthFt": 40,
+      "plotLengthFt": 50,
+      "plotAreaSqft": 2000,
+      "city": "Hyderabad"
+    },
+    "spatialMetrics": {
+      "plotAreaSqft": 2000,
+      "buildingFootprintSqft": 1603,
+      "builtUpAreaSqft": 4499,
+      "carpetAreaSqft": 3912,
+      "carpetEfficiencyPct": 87,
+      "groundCoverageRatioPct": 80,
+      "fsiAchieved": 2.25,
+      "totalRooms": 15,
+      "bedrooms": 4,
+      "bathrooms": 3
+    },
+    "floors": [
+      {
+        "floorIndex": 0,
+        "floorName": "Ground Floor",
+        "roomsCount": 7,
+        "rooms": [
+          {
+            "name": "Front Verandah & Sit-out",
+            "type": "foyer",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "RCC Dog-Legged Stairwell",
+            "type": "stairwell",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Formal Living Lounge",
+            "type": "living",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Central Dining Area",
+            "type": "dining",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Modular Gourmet Kitchen",
+            "type": "kitchen",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Sanitary Bath & Toilet",
+            "type": "bathroom",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Ground Bedroom Suite",
+            "type": "bedroom",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          }
+        ]
+      },
+      {
+        "floorIndex": 1,
+        "floorName": "First Floor",
+        "roomsCount": 6,
+        "rooms": [
+          {
+            "name": "Family Media Lounge & Library",
+            "type": "living",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "RCC Dog-Legged Stairwell (Upper)",
+            "type": "stairwell",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Master Penthouse Suite",
+            "type": "master_bedroom",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Master En-suite Spa Bath",
+            "type": "bathroom",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Children Suite Bedroom 2",
+            "type": "bedroom",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Guest Bedroom 3",
+            "type": "bedroom",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          }
+        ]
+      },
+      {
+        "floorIndex": 2,
+        "floorName": "Terrace / Mumty",
+        "roomsCount": 2,
+        "rooms": [
+          {
+            "name": "Stairhead Mumty & Lift Machine",
+            "type": "stairwell",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Solar Pergola Terrace Garden",
+            "type": "terrace",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          }
+        ]
+      }
+    ],
+    "interiorFitout": {
+      "totalFurnitureItems": 62,
+      "furnishedRoomsCount": 11,
+      "furnitureCostInr": 1216500,
+      "furnitureCostLakhs": 12.16
+    },
+    "geometry3d": {
+      "meshCount": 482,
+      "hasRoofline": true,
+      "hasPhysicalGlass": true,
+      "hasWallSkirting": true
+    },
+    "budgetEstimate": {
+      "cityUsed": "Bengaluru",
+      "targetBudgetInr": 12000000,
+      "targetBudgetLakhs": 120,
+      "totalEstimatedCostInr": 13003555,
+      "totalEstimatedCostLakhs": 130.04,
+      "costPerSqft": 2890,
+      "varianceLakhs": 10.04,
+      "status": "OVER_BUDGET",
+      "civilCoreLakhs": 43.22,
+      "finishesMepLakhs": 35.01,
+      "interiorFurnishingLakhs": 14.14,
+      "categories": [
+        {
+          "id": "site_preparation",
+          "costInr": 336010,
+          "costLakhs": 3.36
+        },
+        {
+          "id": "civil_structure",
+          "costInr": 4321765,
+          "costLakhs": 43.22
+        },
+        {
+          "id": "architectural_finishes",
+          "costInr": 2208248,
+          "costLakhs": 22.08
+        },
+        {
+          "id": "electrical_plumbing",
+          "costInr": 1293225,
+          "costLakhs": 12.93
+        },
+        {
+          "id": "kitchen_bathroom_fittings",
+          "costInr": 197750,
+          "costLakhs": 1.98
+        },
+        {
+          "id": "interior_furnishings",
+          "costInr": 1216500,
+          "costLakhs": 12.16
+        },
+        {
+          "id": "landscaping_outdoor",
+          "costInr": 410602,
+          "costLakhs": 4.11
+        },
+        {
+          "id": "professional_statutory_fees",
+          "costInr": 629365,
+          "costLakhs": 6.29
+        },
+        {
+          "id": "taxes_transport_installation",
+          "costInr": 1541013,
+          "costLakhs": 15.41
+        },
+        {
+          "id": "contingency_escalation",
+          "costInr": 849077,
+          "costLakhs": 8.49
+        }
+      ]
+    },
+    "complianceAndQuality": {
+      "overallQualityScore": 90,
+      "vaastuScore": 91,
+      "circulationScore": 100,
+      "daylightScore": 82,
+      "structuralScore": 95,
+      "hardConstraintsPassed": true,
+      "zeroOverlaps": true,
+      "boundaryContained": true,
+      "checksPerformedCount": 27
+    }
+  },
+  {
+    "id": 5,
+    "name": "Chettinad Heritage Inspired Residence",
+    "city": "Madurai",
+    "plot": "35x55 ft (1,925 sq.ft)",
+    "style": "Heritage Chettinad",
+    "prompt": "Design an authentic Chettinad heritage style 3BHK house on a 35x55 ft plot in Madurai, East facing, with pillared thinnai verandah, athangudi tile aesthetic, pooja room, and dining hall. Budget 85 lakhs.",
+    "success": true,
+    "elapsedMs": 10,
+    "designCode": "LC-12414",
+    "title": "Traditional indian 3BHK (OPEN CONTEMPORARY)",
+    "inputsParsed": {
+      "bhk": 3,
+      "floors": 2,
+      "plotFacing": "North",
+      "archStyle": "traditional_indian",
+      "plotWidthFt": 35,
+      "plotLengthFt": 55,
+      "plotAreaSqft": 1925,
+      "city": "Madurai"
+    },
+    "spatialMetrics": {
+      "plotAreaSqft": 1925,
+      "buildingFootprintSqft": 1561,
+      "builtUpAreaSqft": 3095,
+      "carpetAreaSqft": 2691,
+      "carpetEfficiencyPct": 86.9,
+      "groundCoverageRatioPct": 81,
+      "fsiAchieved": 1.61,
+      "totalRooms": 16,
+      "bedrooms": 3,
+      "bathrooms": 3
+    },
+    "floors": [
+      {
+        "floorIndex": 0,
+        "floorName": "Ground Floor",
+        "roomsCount": 9,
+        "rooms": [
+          {
+            "name": "Front Verandah & Sit-out",
+            "type": "foyer",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "RCC Dog-Legged Stairwell",
+            "type": "stairwell",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Formal Living Lounge",
+            "type": "living",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Central Thotti Courtyard",
+            "type": "courtyard",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Central Dining Area",
+            "type": "dining",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Ishanya Pooja Sanctum",
+            "type": "pooja",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Modular Gourmet Kitchen",
+            "type": "kitchen",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Sanitary Bath & Toilet",
+            "type": "bathroom",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Ground Bedroom Suite",
+            "type": "bedroom",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          }
+        ]
+      },
+      {
+        "floorIndex": 1,
+        "floorName": "First Floor",
+        "roomsCount": 7,
+        "rooms": [
+          {
+            "name": "Cantilever Glass Balcony Deck",
+            "type": "balcony",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Family Media Lounge & Library",
+            "type": "living",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "RCC Dog-Legged Stairwell (Upper)",
+            "type": "stairwell",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Master Penthouse Suite",
+            "type": "master_bedroom",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Master En-suite Spa Bath",
+            "type": "bathroom",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Bedroom 2 Attached Bath",
+            "type": "bathroom",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Children / Guest Bedroom Suite",
+            "type": "bedroom",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          }
+        ]
+      }
+    ],
+    "interiorFitout": {
+      "totalFurnitureItems": 49,
+      "furnishedRoomsCount": 12,
+      "furnitureCostInr": 1063500,
+      "furnitureCostLakhs": 10.63
+    },
+    "geometry3d": {
+      "meshCount": 458,
+      "hasRoofline": true,
+      "hasPhysicalGlass": true,
+      "hasWallSkirting": true
+    },
+    "budgetEstimate": {
+      "cityUsed": "Bengaluru",
+      "targetBudgetInr": 8500000,
+      "targetBudgetLakhs": 85,
+      "totalEstimatedCostInr": 9776444,
+      "totalEstimatedCostLakhs": 97.76,
+      "costPerSqft": 3159,
+      "varianceLakhs": 12.76,
+      "status": "OVER_BUDGET",
+      "civilCoreLakhs": 29.95,
+      "finishesMepLakhs": 25.35,
+      "interiorFurnishingLakhs": 12.61,
+      "categories": [
+        {
+          "id": "site_preparation",
+          "costInr": 338775,
+          "costLakhs": 3.39
+        },
+        {
+          "id": "civil_structure",
+          "costInr": 2995160,
+          "costLakhs": 29.95
+        },
+        {
+          "id": "architectural_finishes",
+          "costInr": 1628307,
+          "costLakhs": 16.28
+        },
+        {
+          "id": "electrical_plumbing",
+          "costInr": 907125,
+          "costLakhs": 9.07
+        },
+        {
+          "id": "kitchen_bathroom_fittings",
+          "costInr": 197750,
+          "costLakhs": 1.98
+        },
+        {
+          "id": "interior_furnishings",
+          "costInr": 1063500,
+          "costLakhs": 10.63
+        },
+        {
+          "id": "landscaping_outdoor",
+          "costInr": 410074,
+          "costLakhs": 4.1
+        },
+        {
+          "id": "professional_statutory_fees",
+          "costInr": 439825,
+          "costLakhs": 4.4
+        },
+        {
+          "id": "taxes_transport_installation",
+          "costInr": 1157487,
+          "costLakhs": 11.57
+        },
+        {
+          "id": "contingency_escalation",
+          "costInr": 638441,
+          "costLakhs": 6.38
+        }
+      ]
+    },
+    "complianceAndQuality": {
+      "overallQualityScore": 90,
+      "vaastuScore": 100,
+      "circulationScore": 100,
+      "daylightScore": 94,
+      "structuralScore": 95,
+      "hardConstraintsPassed": true,
+      "zeroOverlaps": true,
+      "boundaryContained": true,
+      "checksPerformedCount": 27
+    }
+  },
+  {
+    "id": 6,
+    "name": "Minimalist Japandi Duplex Villa",
+    "city": "Pune",
+    "plot": "30x50 ft (1,500 sq.ft)",
+    "style": "Minimalist Japandi",
+    "prompt": "Build a minimalist contemporary 3BHK house on a 30x50 ft plot in Pune, North-East facing, with light wood finishes, large glass windows, minimalist kitchen, and study room. Budget 80 lakhs.",
+    "success": true,
+    "elapsedMs": 7,
+    "designCode": "LC-12511",
+    "title": "Minimalist 3BHK (OPEN CONTEMPORARY)",
+    "inputsParsed": {
+      "bhk": 3,
+      "floors": 2,
+      "plotFacing": "North",
+      "archStyle": "minimalist",
+      "plotWidthFt": 30,
+      "plotLengthFt": 50,
+      "plotAreaSqft": 1500,
+      "city": "Pune"
+    },
+    "spatialMetrics": {
+      "plotAreaSqft": 1500,
+      "buildingFootprintSqft": 1133,
+      "builtUpAreaSqft": 3134,
+      "carpetAreaSqft": 2725,
+      "carpetEfficiencyPct": 86.9,
+      "groundCoverageRatioPct": 76,
+      "fsiAchieved": 2.09,
+      "totalRooms": 15,
+      "bedrooms": 3,
+      "bathrooms": 3
+    },
+    "floors": [
+      {
+        "floorIndex": 0,
+        "floorName": "Ground Floor",
+        "roomsCount": 7,
+        "rooms": [
+          {
+            "name": "Front Verandah & Sit-out",
+            "type": "foyer",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "RCC Dog-Legged Stairwell",
+            "type": "stairwell",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Formal Living Lounge",
+            "type": "living",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Central Dining Area",
+            "type": "dining",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Modular Gourmet Kitchen",
+            "type": "kitchen",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Sanitary Bath & Toilet",
+            "type": "bathroom",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Ground Bedroom Suite",
+            "type": "bedroom",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          }
+        ]
+      },
+      {
+        "floorIndex": 1,
+        "floorName": "First Floor",
+        "roomsCount": 6,
+        "rooms": [
+          {
+            "name": "Family Media Lounge & Library",
+            "type": "living",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "RCC Dog-Legged Stairwell (Upper)",
+            "type": "stairwell",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Master Penthouse Suite",
+            "type": "master_bedroom",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Master En-suite Spa Bath",
+            "type": "bathroom",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Bedroom 2 Attached Bath",
+            "type": "bathroom",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Children / Guest Bedroom Suite",
+            "type": "bedroom",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          }
+        ]
+      },
+      {
+        "floorIndex": 2,
+        "floorName": "Terrace / Mumty",
+        "roomsCount": 2,
+        "rooms": [
+          {
+            "name": "Stairhead Mumty & Lift Machine",
+            "type": "stairwell",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Solar Pergola Terrace Garden",
+            "type": "terrace",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          }
+        ]
+      }
+    ],
+    "interiorFitout": {
+      "totalFurnitureItems": 53,
+      "furnishedRoomsCount": 11,
+      "furnitureCostInr": 1073000,
+      "furnitureCostLakhs": 10.73
+    },
+    "geometry3d": {
+      "meshCount": 450,
+      "hasRoofline": true,
+      "hasPhysicalGlass": true,
+      "hasWallSkirting": true
+    },
+    "budgetEstimate": {
+      "cityUsed": "Bengaluru",
+      "targetBudgetInr": 8000000,
+      "targetBudgetLakhs": 80,
+      "totalEstimatedCostInr": 9751133,
+      "totalEstimatedCostLakhs": 97.51,
+      "costPerSqft": 3111,
+      "varianceLakhs": 17.51,
+      "status": "OVER_BUDGET",
+      "civilCoreLakhs": 30.14,
+      "finishesMepLakhs": 25.2,
+      "interiorFurnishingLakhs": 12.71,
+      "categories": [
+        {
+          "id": "site_preparation",
+          "costInr": 302620,
+          "costLakhs": 3.03
+        },
+        {
+          "id": "civil_structure",
+          "costInr": 3013690,
+          "costLakhs": 30.14
+        },
+        {
+          "id": "architectural_finishes",
+          "costInr": 1602419,
+          "costLakhs": 16.02
+        },
+        {
+          "id": "electrical_plumbing",
+          "costInr": 917850,
+          "costLakhs": 9.18
+        },
+        {
+          "id": "kitchen_bathroom_fittings",
+          "costInr": 197750,
+          "costLakhs": 1.98
+        },
+        {
+          "id": "interior_furnishings",
+          "costInr": 1073000,
+          "costLakhs": 10.73
+        },
+        {
+          "id": "landscaping_outdoor",
+          "costInr": 407242,
+          "costLakhs": 4.07
+        },
+        {
+          "id": "professional_statutory_fees",
+          "costInr": 445090,
+          "costLakhs": 4.45
+        },
+        {
+          "id": "taxes_transport_installation",
+          "costInr": 1154699,
+          "costLakhs": 11.55
+        },
+        {
+          "id": "contingency_escalation",
+          "costInr": 636773,
+          "costLakhs": 6.37
+        }
+      ]
+    },
+    "complianceAndQuality": {
+      "overallQualityScore": 90,
+      "vaastuScore": 91,
+      "circulationScore": 100,
+      "daylightScore": 81,
+      "structuralScore": 95,
+      "hardConstraintsPassed": true,
+      "zeroOverlaps": true,
+      "boundaryContained": true,
+      "checksPerformedCount": 27
+    }
+  },
+  {
+    "id": 7,
+    "name": "Spacious Multi-Generational Villa",
+    "city": "Coimbatore",
+    "plot": "50x60 ft (3,000 sq.ft)",
+    "style": "Modern Villa",
+    "prompt": "Design a spacious 5BHK two-storey duplex on a 50x60 ft plot in Coimbatore, North facing, with ground floor senior-citizen bedroom, 2 master suites, dedicated pooja, 2 car parking, and garden. Budget 1.5 crore.",
+    "success": true,
+    "elapsedMs": 10,
+    "designCode": "LC-12608",
+    "title": "Modern 5BHK (OPEN CONTEMPORARY)",
+    "inputsParsed": {
+      "bhk": 5,
+      "floors": 2,
+      "plotFacing": "North",
+      "archStyle": "modern",
+      "plotWidthFt": 50,
+      "plotLengthFt": 60,
+      "plotAreaSqft": 3000,
+      "city": "Coimbatore"
+    },
+    "spatialMetrics": {
+      "plotAreaSqft": 3000,
+      "buildingFootprintSqft": 1233,
+      "builtUpAreaSqft": 3402,
+      "carpetAreaSqft": 2958,
+      "carpetEfficiencyPct": 86.9,
+      "groundCoverageRatioPct": 41,
+      "fsiAchieved": 1.13,
+      "totalRooms": 17,
+      "bedrooms": 5,
+      "bathrooms": 3
+    },
+    "floors": [
+      {
+        "floorIndex": 0,
+        "floorName": "Ground Floor",
+        "roomsCount": 9,
+        "rooms": [
+          {
+            "name": "Covered Car Porch & Portico",
+            "type": "portico",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Grand Entrance Foyer & Verandah",
+            "type": "foyer",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "RCC Dog-Legged Stairwell",
+            "type": "stairwell",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Formal Living Lounge",
+            "type": "living",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Central Dining Area",
+            "type": "dining",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Ishanya Pooja Sanctum",
+            "type": "pooja",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Modular Gourmet Kitchen",
+            "type": "kitchen",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Sanitary Bath & Toilet",
+            "type": "bathroom",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Ground Bedroom Suite",
+            "type": "bedroom",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          }
+        ]
+      },
+      {
+        "floorIndex": 1,
+        "floorName": "First Floor",
+        "roomsCount": 6,
+        "rooms": [
+          {
+            "name": "Family Media Lounge & Library",
+            "type": "living",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "RCC Dog-Legged Stairwell (Upper)",
+            "type": "stairwell",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Master Penthouse Suite",
+            "type": "master_bedroom",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Master En-suite Spa Bath",
+            "type": "bathroom",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Children Suite Bedroom 2",
+            "type": "bedroom",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Guest Bedroom 3",
+            "type": "bedroom",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          }
+        ]
+      },
+      {
+        "floorIndex": 2,
+        "floorName": "Terrace / Mumty",
+        "roomsCount": 2,
+        "rooms": [
+          {
+            "name": "Stairhead Mumty & Lift Machine",
+            "type": "stairwell",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Solar Pergola Terrace Garden",
+            "type": "terrace",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          }
+        ]
+      }
+    ],
+    "interiorFitout": {
+      "totalFurnitureItems": 64,
+      "furnishedRoomsCount": 13,
+      "furnitureCostInr": 1106500,
+      "furnitureCostLakhs": 11.06
+    },
+    "geometry3d": {
+      "meshCount": 514,
+      "hasRoofline": true,
+      "hasPhysicalGlass": true,
+      "hasWallSkirting": true
+    },
+    "budgetEstimate": {
+      "cityUsed": "Bengaluru",
+      "targetBudgetInr": 15000000,
+      "targetBudgetLakhs": 150,
+      "totalEstimatedCostInr": 10730172,
+      "totalEstimatedCostLakhs": 107.3,
+      "costPerSqft": 3154,
+      "varianceLakhs": -42.7,
+      "status": "WITHIN_BUDGET",
+      "civilCoreLakhs": 32.91,
+      "finishesMepLakhs": 27.36,
+      "interiorFurnishingLakhs": 13.04,
+      "categories": [
+        {
+          "id": "site_preparation",
+          "costInr": 417506,
+          "costLakhs": 4.18
+        },
+        {
+          "id": "civil_structure",
+          "costInr": 3290680,
+          "costLakhs": 32.91
+        },
+        {
+          "id": "architectural_finishes",
+          "costInr": 1744602,
+          "costLakhs": 17.45
+        },
+        {
+          "id": "electrical_plumbing",
+          "costInr": 991550,
+          "costLakhs": 9.92
+        },
+        {
+          "id": "kitchen_bathroom_fittings",
+          "costInr": 197750,
+          "costLakhs": 1.98
+        },
+        {
+          "id": "interior_furnishings",
+          "costInr": 1106500,
+          "costLakhs": 11.06
+        },
+        {
+          "id": "landscaping_outdoor",
+          "costInr": 529231,
+          "costLakhs": 5.29
+        },
+        {
+          "id": "professional_statutory_fees",
+          "costInr": 481270,
+          "costLakhs": 4.81
+        },
+        {
+          "id": "taxes_transport_installation",
+          "costInr": 1270356,
+          "costLakhs": 12.7
+        },
+        {
+          "id": "contingency_escalation",
+          "costInr": 700727,
+          "costLakhs": 7.01
+        }
+      ]
+    },
+    "complianceAndQuality": {
+      "overallQualityScore": 83,
+      "vaastuScore": 100,
+      "circulationScore": 100,
+      "daylightScore": 74,
+      "structuralScore": 95,
+      "hardConstraintsPassed": true,
+      "zeroOverlaps": true,
+      "boundaryContained": true,
+      "checksPerformedCount": 27
+    }
+  },
+  {
+    "id": 8,
+    "name": "Eco-Friendly Single-Storey Bungalow",
+    "city": "Mysore",
+    "plot": "30x45 ft (1,350 sq.ft)",
+    "style": "Eco Contemporary",
+    "prompt": "Create a cost-effective 3BHK single-storey residence on a 30x45 ft plot in Mysore, East facing, with rainwater harvesting, cross-ventilation, open concept dining, and solar roof. Budget 55 lakhs.",
+    "success": true,
+    "elapsedMs": 4,
+    "designCode": "LC-12705",
+    "title": "Modern 3BHK (OPEN CONTEMPORARY)",
+    "inputsParsed": {
+      "bhk": 3,
+      "floors": 1,
+      "plotFacing": "North",
+      "archStyle": "modern",
+      "plotWidthFt": 30,
+      "plotLengthFt": 45,
+      "plotAreaSqft": 1350,
+      "city": "Mysore"
+    },
+    "spatialMetrics": {
+      "plotAreaSqft": 1350,
+      "buildingFootprintSqft": 992,
+      "builtUpAreaSqft": 992,
+      "carpetAreaSqft": 863,
+      "carpetEfficiencyPct": 87,
+      "groundCoverageRatioPct": 73,
+      "fsiAchieved": 0.73,
+      "totalRooms": 7,
+      "bedrooms": 3,
+      "bathrooms": 2
+    },
+    "floors": [
+      {
+        "floorIndex": 0,
+        "floorName": "Ground Floor",
+        "roomsCount": 7,
+        "rooms": [
+          {
+            "name": "Front Verandah & Sit-out",
+            "type": "foyer",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Formal Living Lounge",
+            "type": "living",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Central Dining Area",
+            "type": "dining",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Modular Gourmet Kitchen",
+            "type": "kitchen",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Master Bedroom Suite",
+            "type": "master_bedroom",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Sanitary Bath & Toilet",
+            "type": "bathroom",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Secondary Bedroom Suite",
+            "type": "bedroom",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          }
+        ]
+      }
+    ],
+    "interiorFitout": {
+      "totalFurnitureItems": 29,
+      "furnishedRoomsCount": 6,
+      "furnitureCostInr": 634500,
+      "furnitureCostLakhs": 6.34
+    },
+    "geometry3d": {
+      "meshCount": 276,
+      "hasRoofline": true,
+      "hasPhysicalGlass": true,
+      "hasWallSkirting": true
+    },
+    "budgetEstimate": {
+      "cityUsed": "Bengaluru",
+      "targetBudgetInr": 5500000,
+      "targetBudgetLakhs": 55,
+      "totalEstimatedCostInr": 4403528,
+      "totalEstimatedCostLakhs": 44.04,
+      "costPerSqft": 4439,
+      "varianceLakhs": -10.96,
+      "status": "OVER_BUDGET",
+      "civilCoreLakhs": 10.41,
+      "finishesMepLakhs": 9.17,
+      "interiorFurnishingLakhs": 7.9,
+      "categories": [
+        {
+          "id": "site_preparation",
+          "costInr": 285645,
+          "costLakhs": 2.86
+        },
+        {
+          "id": "civil_structure",
+          "costInr": 1040945,
+          "costLakhs": 10.41
+        },
+        {
+          "id": "architectural_finishes",
+          "costInr": 588076,
+          "costLakhs": 5.88
+        },
+        {
+          "id": "electrical_plumbing",
+          "costInr": 328800,
+          "costLakhs": 3.29
+        },
+        {
+          "id": "kitchen_bathroom_fittings",
+          "costInr": 155950,
+          "costLakhs": 1.56
+        },
+        {
+          "id": "interior_furnishings",
+          "costInr": 634500,
+          "costLakhs": 6.34
+        },
+        {
+          "id": "landscaping_outdoor",
+          "costInr": 406042,
+          "costLakhs": 4.06
+        },
+        {
+          "id": "professional_statutory_fees",
+          "costInr": 155920,
+          "costLakhs": 1.56
+        },
+        {
+          "id": "taxes_transport_installation",
+          "costInr": 519980,
+          "costLakhs": 5.2
+        },
+        {
+          "id": "contingency_escalation",
+          "costInr": 287670,
+          "costLakhs": 2.88
+        }
+      ]
+    },
+    "complianceAndQuality": {
+      "overallQualityScore": 84,
+      "vaastuScore": 100,
+      "circulationScore": 100,
+      "daylightScore": 88,
+      "structuralScore": 95,
+      "hardConstraintsPassed": true,
+      "zeroOverlaps": true,
+      "boundaryContained": true,
+      "checksPerformedCount": 27
+    }
+  },
+  {
+    "id": 9,
+    "name": "Tropical Coastal Resort Duplex",
+    "city": "Goa",
+    "plot": "35x60 ft (2,100 sq.ft)",
+    "style": "Tropical Coastal",
+    "prompt": "Design a tropical coastal 3BHK duplex on a 35x60 ft plot in Goa, West facing, with wrap-around balconies, outdoor sit-out deck, large louvers, and private garden. Budget 1.1 crore.",
+    "success": true,
+    "elapsedMs": 8,
+    "designCode": "LC-12802",
+    "title": "Tropical modern 3BHK (OPEN CONTEMPORARY)",
+    "inputsParsed": {
+      "bhk": 3,
+      "floors": 2,
+      "plotFacing": "North",
+      "archStyle": "tropical_modern",
+      "plotWidthFt": 35,
+      "plotLengthFt": 60,
+      "plotAreaSqft": 2100,
+      "city": "Goa"
+    },
+    "spatialMetrics": {
+      "plotAreaSqft": 2100,
+      "buildingFootprintSqft": 1208,
+      "builtUpAreaSqft": 3376,
+      "carpetAreaSqft": 2935,
+      "carpetEfficiencyPct": 86.9,
+      "groundCoverageRatioPct": 58,
+      "fsiAchieved": 1.61,
+      "totalRooms": 16,
+      "bedrooms": 3,
+      "bathrooms": 3
+    },
+    "floors": [
+      {
+        "floorIndex": 0,
+        "floorName": "Ground Floor",
+        "roomsCount": 7,
+        "rooms": [
+          {
+            "name": "Front Verandah & Sit-out",
+            "type": "foyer",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "RCC Dog-Legged Stairwell",
+            "type": "stairwell",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Formal Living Lounge",
+            "type": "living",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Central Dining Area",
+            "type": "dining",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Modular Gourmet Kitchen",
+            "type": "kitchen",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Sanitary Bath & Toilet",
+            "type": "bathroom",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Ground Bedroom Suite",
+            "type": "bedroom",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          }
+        ]
+      },
+      {
+        "floorIndex": 1,
+        "floorName": "First Floor",
+        "roomsCount": 7,
+        "rooms": [
+          {
+            "name": "Cantilever Glass Balcony Deck",
+            "type": "balcony",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Family Media Lounge & Library",
+            "type": "living",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "RCC Dog-Legged Stairwell (Upper)",
+            "type": "stairwell",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Master Penthouse Suite",
+            "type": "master_bedroom",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Master En-suite Spa Bath",
+            "type": "bathroom",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Bedroom 2 Attached Bath",
+            "type": "bathroom",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Children / Guest Bedroom Suite",
+            "type": "bedroom",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          }
+        ]
+      },
+      {
+        "floorIndex": 2,
+        "floorName": "Terrace / Mumty",
+        "roomsCount": 2,
+        "rooms": [
+          {
+            "name": "Stairhead Mumty & Lift Machine",
+            "type": "stairwell",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Solar Pergola Terrace Garden",
+            "type": "terrace",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          }
+        ]
+      }
+    ],
+    "interiorFitout": {
+      "totalFurnitureItems": 60,
+      "furnishedRoomsCount": 12,
+      "furnitureCostInr": 1088500,
+      "furnitureCostLakhs": 10.88
+    },
+    "geometry3d": {
+      "meshCount": 479,
+      "hasRoofline": true,
+      "hasPhysicalGlass": true,
+      "hasWallSkirting": true
+    },
+    "budgetEstimate": {
+      "cityUsed": "Bengaluru",
+      "targetBudgetInr": 11000000,
+      "targetBudgetLakhs": 110,
+      "totalEstimatedCostInr": 10454067,
+      "totalEstimatedCostLakhs": 104.54,
+      "costPerSqft": 3097,
+      "varianceLakhs": -5.46,
+      "status": "OVER_BUDGET",
+      "civilCoreLakhs": 32.41,
+      "finishesMepLakhs": 27.16,
+      "interiorFurnishingLakhs": 12.86,
+      "categories": [
+        {
+          "id": "site_preparation",
+          "costInr": 352646,
+          "costLakhs": 3.53
+        },
+        {
+          "id": "civil_structure",
+          "costInr": 3241005,
+          "costLakhs": 32.41
+        },
+        {
+          "id": "architectural_finishes",
+          "costInr": 1731897,
+          "costLakhs": 17.32
+        },
+        {
+          "id": "electrical_plumbing",
+          "costInr": 984400,
+          "costLakhs": 9.84
+        },
+        {
+          "id": "kitchen_bathroom_fittings",
+          "costInr": 197750,
+          "costLakhs": 1.98
+        },
+        {
+          "id": "interior_furnishings",
+          "costInr": 1088500,
+          "costLakhs": 10.88
+        },
+        {
+          "id": "landscaping_outdoor",
+          "costInr": 459476,
+          "costLakhs": 4.59
+        },
+        {
+          "id": "professional_statutory_fees",
+          "costInr": 477760,
+          "costLakhs": 4.78
+        },
+        {
+          "id": "taxes_transport_installation",
+          "costInr": 1237958,
+          "costLakhs": 12.38
+        },
+        {
+          "id": "contingency_escalation",
+          "costInr": 682675,
+          "costLakhs": 6.83
+        }
+      ]
+    },
+    "complianceAndQuality": {
+      "overallQualityScore": 88,
+      "vaastuScore": 91,
+      "circulationScore": 100,
+      "daylightScore": 75,
+      "structuralScore": 95,
+      "hardConstraintsPassed": true,
+      "zeroOverlaps": true,
+      "boundaryContained": true,
+      "checksPerformedCount": 27
+    }
+  },
+  {
+    "id": 10,
+    "name": "Linear Urban Duplex Residence",
+    "city": "Mumbai",
+    "plot": "25x50 ft (1,250 sq.ft)",
+    "style": "Modern Urban Linear",
+    "prompt": "Design a modern 3BHK duplex on a 25x50 ft plot in Mumbai, North facing, with vertical circulation, space-saving built-in wardrobes, linear open kitchen, and terrace patio. Budget 95 lakhs.",
+    "success": true,
+    "elapsedMs": 6,
+    "designCode": "LC-13521",
+    "title": "Modern 3BHK (VILLA PAVILION)",
+    "inputsParsed": {
+      "bhk": 3,
+      "floors": 2,
+      "plotFacing": "North",
+      "archStyle": "modern",
+      "plotWidthFt": 25,
+      "plotLengthFt": 50,
+      "plotAreaSqft": 1250,
+      "city": "Mumbai"
+    },
+    "spatialMetrics": {
+      "plotAreaSqft": 1250,
+      "buildingFootprintSqft": 896,
+      "builtUpAreaSqft": 2431,
+      "carpetAreaSqft": 2114,
+      "carpetEfficiencyPct": 87,
+      "groundCoverageRatioPct": 72,
+      "fsiAchieved": 1.94,
+      "totalRooms": 14,
+      "bedrooms": 3,
+      "bathrooms": 3
+    },
+    "floors": [
+      {
+        "floorIndex": 0,
+        "floorName": "Ground Floor",
+        "roomsCount": 7,
+        "rooms": [
+          {
+            "name": "Front Verandah & Sit-out",
+            "type": "foyer",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "RCC Dog-Legged Stairwell",
+            "type": "stairwell",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Formal Living Lounge",
+            "type": "living",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Central Dining Area",
+            "type": "dining",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Modular Gourmet Kitchen",
+            "type": "kitchen",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Sanitary Bath & Toilet",
+            "type": "bathroom",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Ground Bedroom Suite",
+            "type": "bedroom",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          }
+        ]
+      },
+      {
+        "floorIndex": 1,
+        "floorName": "First Floor",
+        "roomsCount": 5,
+        "rooms": [
+          {
+            "name": "Family Media Lounge & Library",
+            "type": "living",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "RCC Dog-Legged Stairwell (Upper)",
+            "type": "stairwell",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Master Penthouse Suite",
+            "type": "master_bedroom",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Master En-suite Spa Bath",
+            "type": "bathroom",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Children / Study Bedroom Suite",
+            "type": "bedroom",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          }
+        ]
+      },
+      {
+        "floorIndex": 2,
+        "floorName": "Terrace / Mumty",
+        "roomsCount": 2,
+        "rooms": [
+          {
+            "name": "Stairhead Mumty & Lift Machine",
+            "type": "stairwell",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          },
+          {
+            "name": "Solar Pergola Terrace Garden",
+            "type": "terrace",
+            "widthFt": null,
+            "lengthFt": null,
+            "areaSqft": 0
+          }
+        ]
+      }
+    ],
+    "interiorFitout": {
+      "totalFurnitureItems": 42,
+      "furnishedRoomsCount": 9,
+      "furnitureCostInr": 830000,
+      "furnitureCostLakhs": 8.3
+    },
+    "geometry3d": {
+      "meshCount": 415,
+      "hasRoofline": true,
+      "hasPhysicalGlass": true,
+      "hasWallSkirting": true
+    },
+    "budgetEstimate": {
+      "cityUsed": "Bengaluru",
+      "targetBudgetInr": 9500000,
+      "targetBudgetLakhs": 95,
+      "totalEstimatedCostInr": 7878163,
+      "totalEstimatedCostLakhs": 78.78,
+      "costPerSqft": 3241,
+      "varianceLakhs": -16.22,
+      "status": "OVER_BUDGET",
+      "civilCoreLakhs": 23.59,
+      "finishesMepLakhs": 20.01,
+      "interiorFurnishingLakhs": 10.28,
+      "categories": [
+        {
+          "id": "site_preparation",
+          "costInr": 290945,
+          "costLakhs": 2.91
+        },
+        {
+          "id": "civil_structure",
+          "costInr": 2359095,
+          "costLakhs": 23.59
+        },
+        {
+          "id": "architectural_finishes",
+          "costInr": 1276315,
+          "costLakhs": 12.76
+        },
+        {
+          "id": "electrical_plumbing",
+          "costInr": 724525,
+          "costLakhs": 7.25
+        },
+        {
+          "id": "kitchen_bathroom_fittings",
+          "costInr": 197750,
+          "costLakhs": 1.98
+        },
+        {
+          "id": "interior_furnishings",
+          "costInr": 830000,
+          "costLakhs": 8.3
+        },
+        {
+          "id": "landscaping_outdoor",
+          "costInr": 402262,
+          "costLakhs": 4.02
+        },
+        {
+          "id": "professional_statutory_fees",
+          "costInr": 350185,
+          "costLakhs": 3.5
+        },
+        {
+          "id": "taxes_transport_installation",
+          "costInr": 932600,
+          "costLakhs": 9.33
+        },
+        {
+          "id": "contingency_escalation",
+          "costInr": 514486,
+          "costLakhs": 5.14
+        }
+      ]
+    },
+    "complianceAndQuality": {
+      "overallQualityScore": 90,
+      "vaastuScore": 100,
+      "circulationScore": 100,
+      "daylightScore": 81,
+      "structuralScore": 95,
+      "hardConstraintsPassed": true,
+      "zeroOverlaps": true,
+      "boundaryContained": true,
+      "checksPerformedCount": 27
+    }
+  }
+]

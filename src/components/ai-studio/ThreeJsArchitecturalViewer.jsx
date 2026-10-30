@@ -813,10 +813,11 @@ const ThreeJsArchitecturalViewer = forwardRef(function ThreeJsArchitecturalViewe
       // Auto-initialize camera position and target center
       if (controlsRef.current) {
         controlsRef.current.target.copy(center);
-        if (!controlsRef.current.userData?.initialized) {
+        const lastDesignId = controlsRef.current.userData?.designId;
+        if (!controlsRef.current.userData?.initialized || lastDesignId !== (design?.id || design?.code)) {
           const dist = Math.max(sizeX, sizeY, sizeZ) * 1.85;
           cameraRef.current.position.set(center.x + dist * 0.85, center.y + dist * 0.75, center.z + dist * 0.85);
-          controlsRef.current.userData = { initialized: true };
+          controlsRef.current.userData = { initialized: true, designId: design?.id || design?.code };
         }
         controlsRef.current.update();
       }

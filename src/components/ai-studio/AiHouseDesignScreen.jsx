@@ -311,6 +311,21 @@ export default function AiHouseDesignScreen({
       };
 
       setValidatedSpecs(specs);
+      // Synchronize structured input controls directly from interpreted specification
+      if (interp.specs.plotWidth) setPlotWidth(interp.specs.plotWidth);
+      if (interp.specs.plotLength) setPlotLength(interp.specs.plotLength);
+      if (interp.specs.bhkCount) setBhkCount(interp.specs.bhkCount);
+      if (interp.specs.bathroomsCount) setBathroomsCount(interp.specs.bathroomsCount);
+      if (interp.specs.floorsCount) setFloorsCount(interp.specs.floorsCount);
+      if (interp.specs.archStyle) setArchStyle(interp.specs.archStyle);
+      if (interp.specs.facingDirection) setFacingDirection(interp.specs.facingDirection);
+      if (interp.specs.homeBudgetInr) setHomeBudgetInr(interp.specs.homeBudgetInr);
+      if (interp.specs.amenities?.hasPooja !== undefined) setHasPooja(interp.specs.amenities.hasPooja);
+      if (interp.specs.amenities?.hasParking !== undefined) setHasParking(interp.specs.amenities.hasParking);
+      if (interp.specs.amenities?.hasBalcony !== undefined) setHasBalcony(interp.specs.amenities.hasBalcony);
+      if (interp.specs.amenities?.hasCourtyard !== undefined) setHasCourtyard(interp.specs.amenities.hasCourtyard);
+      if (interp.specs.amenities?.hasSolarPergola !== undefined) setHasSolarPergola(interp.specs.amenities.hasSolarPergola);
+
       setIsRequirementConfirmed(true);
       confetti({ particleCount: 35, spread: 45 });
     }, 450);
@@ -385,20 +400,20 @@ export default function AiHouseDesignScreen({
     setTimeout(() => {
       clearInterval(stepInterval);
       const rawInputs = {
-        plotWidth,
-        plotLength,
+        plotWidth: validatedSpecs?.plotWidth || plotWidth,
+        plotLength: validatedSpecs?.plotLength || plotLength,
         dimensionUnit,
-        floorsCount,
-        bhkCount,
-        bathroomsCount,
-        archStyle,
-        facingDirection,
-        homeBudgetInr,
-        hasPooja,
-        hasParking,
-        hasBalcony,
-        hasCourtyard,
-        hasSolarPergola,
+        floorsCount: validatedSpecs?.floorsCount || floorsCount,
+        bhkCount: validatedSpecs?.bhkCount || bhkCount,
+        bathroomsCount: validatedSpecs?.bathroomsCount || bathroomsCount,
+        archStyle: validatedSpecs?.archStyle || archStyle,
+        facingDirection: validatedSpecs?.facingDirection || facingDirection,
+        homeBudgetInr: validatedSpecs?.homeBudgetInr || homeBudgetInr,
+        hasPooja: validatedSpecs?.amenities?.hasPooja !== undefined ? validatedSpecs.amenities.hasPooja : hasPooja,
+        hasParking: validatedSpecs?.amenities?.hasParking !== undefined ? validatedSpecs.amenities.hasParking : hasParking,
+        hasBalcony: validatedSpecs?.amenities?.hasBalcony !== undefined ? validatedSpecs.amenities.hasBalcony : hasBalcony,
+        hasCourtyard: validatedSpecs?.amenities?.hasCourtyard !== undefined ? validatedSpecs.amenities.hasCourtyard : hasCourtyard,
+        hasSolarPergola: validatedSpecs?.amenities?.hasSolarPergola !== undefined ? validatedSpecs.amenities.hasSolarPergola : hasSolarPergola,
         kitchenType,
         userPrompt: homePrompt
       };

@@ -181,7 +181,7 @@ export function calculateProjectBudget(design, options = {}) {
     : Math.round(builtUpSqft * 2.4);
   const netMasonrySqft = Math.max(Math.round(builtUpSqft * 1.6), grossWallAreaSqft - totalOpeningsAreaSqft);
   const exteriorWallSqft = Math.round(netMasonrySqft * 0.55);
-  const interiorWallSqft = Math.round(netMasonrySqft * 0.45);
+  const interiorWallSqft = netMasonrySqft - exteriorWallSqft;
 
   // Flooring finishes breakdown
   const flooringBreakdown = {

@@ -474,6 +474,10 @@ export function buildRealisticModel(furnitureType, dimensions, style = 'contempo
       break;
     }
 
+    case 'vanity':
+    case 'vanity_basin':
+    case 'vanity':
+    case 'vanity_basin':
     case 'bathroom_vanity': {
       const cabH = H * 0.65;
 
@@ -545,6 +549,7 @@ export function buildRealisticModel(furnitureType, dimensions, style = 'contempo
     // KITCHEN COUNTER BASE & ISLAND
     // Detailed modular base cabinets, Shaker doors, handles, marble slab, sink & hob
     // -------------------------------------------------------------------------
+    case 'kitchen_counter':
     case 'kitchen_counter_base':
     case 'kitchen_island': {
       const isIsland = furnitureType === 'kitchen_island';
@@ -775,9 +780,58 @@ export function buildRealisticModel(furnitureType, dimensions, style = 'contempo
     }
 
     // -------------------------------------------------------------------------
+    // KITCHEN UPPER WALL CABINETS
+    // Modular overhead wall cabinets with Shaker doors, bar handles & LED task lights
+    // -------------------------------------------------------------------------
+    case 'kitchen_upper_cabinets': {
+      const numDoors = Math.max(2, Math.floor(W / 1.8));
+      const doorW = (W - 0.06 * (numDoors - 1)) / numDoors;
+      const cabMat = isVintage ? woodMat : new THREE.MeshStandardMaterial({ color: '#f8fafc', roughness: 0.35 });
+
+      // 1. Cabinet Carcass Body
+      const carcassGeo = new THREE.BoxGeometry(W, H, D);
+      const carcass = new THREE.Mesh(carcassGeo, cabMat);
+      carcass.position.set(0, H / 2, 0);
+      carcass.castShadow = true;
+      group.add(carcass);
+
+      // 2. Shaker Doors with Handles
+      const doorGeo = new THREE.BoxGeometry(doorW - 0.04, H - 0.08, 0.04);
+      const handleMat = isVintage ? brassMat : chromeMat;
+      const handleGeo = new THREE.CylinderGeometry(0.018, 0.018, 0.28, 8);
+
+      for (let i = 0; i < numDoors; i++) {
+        const dx = -W / 2 + doorW / 2 + i * doorW;
+        const door = new THREE.Mesh(doorGeo, cabMat);
+        door.position.set(dx, H / 2, D / 2 + 0.02);
+        door.castShadow = true;
+        group.add(door);
+
+        const handle = new THREE.Mesh(handleGeo, handleMat);
+        handle.position.set(dx + (i % 2 === 0 ? doorW * 0.35 : -doorW * 0.35), H * 0.25, D / 2 + 0.05);
+        group.add(handle);
+      }
+
+      // 3. Under-Cabinet Warm LED Task Light Strip
+      const ledGeo = new THREE.BoxGeometry(W * 0.92, 0.03, 0.1);
+      const ledMat = new THREE.MeshStandardMaterial({
+        color: '#fef08a',
+        emissive: '#fef08a',
+        emissiveIntensity: 0.8,
+        roughness: 0.2
+      });
+      const ledStrip = new THREE.Mesh(ledGeo, ledMat);
+      ledStrip.position.set(0, 0.02, 0);
+      group.add(ledStrip);
+      break;
+    }
+
+    // -------------------------------------------------------------------------
     // TV CONSOLE & ENTERTAINMENT UNIT (Sleek TV Console + OLED Screen + Soundbar)
     // -------------------------------------------------------------------------
-    case 'tv_console': {
+    case 'tv_console':
+    case 'tv_unit':
+    case 'media_console': {
       const consoleH = 1.4;
       const tvH = 2.6;
       const tvW = W * 0.82;
@@ -831,6 +885,7 @@ export function buildRealisticModel(furnitureType, dimensions, style = 'contempo
     // -------------------------------------------------------------------------
     // ARCHITECTURAL WARDROBE (4-Door, 3-Door, 2-Door)
     // -------------------------------------------------------------------------
+    case 'wardrobe':
     case 'wardrobe_4door':
     case 'wardrobe_3door':
     case 'wardrobe_2door': {
@@ -989,6 +1044,8 @@ export function buildRealisticModel(furnitureType, dimensions, style = 'contempo
     // -------------------------------------------------------------------------
     // SHOWER ENCLOSURE (Clear Tempered Glass Cubicle + Rain Shower)
     // -------------------------------------------------------------------------
+    case 'shower':
+    case 'shower':
     case 'shower_enclosure': {
       const glassMat = createArchitecturalGlassMaterial({
         color: '#e0f2fe',
@@ -1037,6 +1094,10 @@ export function buildRealisticModel(furnitureType, dimensions, style = 'contempo
     // -------------------------------------------------------------------------
     // POOJA MANDIR (Traditional Indian Carved Teak Sanctum + Shikhara + Diya)
     // -------------------------------------------------------------------------
+    case 'mandir':
+    case 'pooja':
+    case 'mandir':
+    case 'pooja':
     case 'pooja_mandir': {
       // 1. Stepped Sacred Altar Pedestal (Peedam)
       const baseGeo = new THREE.BoxGeometry(W, 0.65, D);

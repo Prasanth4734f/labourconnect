@@ -785,19 +785,31 @@ export function layoutCadRoomLabel(room, scale = 9.5, columns = [], pxFn = null,
 
   let rawName = (room.name || 'ROOM').toUpperCase().trim();
 
+  // Canonical architectural prefix clean-up
+  rawName = rawName
+    .replace(/^GRAND\s+/i, '')
+    .replace(/^RCC\s+(DOG-LEGGED\s+)?/i, '')
+    .replace(/^FORMAL\s+/i, '')
+    .replace(/^CENTRAL\s+/i, '')
+    .replace(/^ISHANYA\s+/i, '')
+    .replace(/^MODULAR\s+/i, '')
+    .replace(/^GROUND\s+SUITE\s+/i, '')
+    .replace(/^SECONDARY\s+/i, '')
+    .replace(/^MASTER\s+PENTHOUSE\s+/i, 'MASTER ');
+
   // Canonical architectural simplifications for CAD drawings
   const CAD_SIMPLIFICATIONS = [
-    [/^GRAND ENTRANCE FOYER & VERANDAH$/i, 'FOYER & VERANDAH'],
-    [/^COVERED CAR PORCH & PORTICO$/i, 'CAR PORCH & PORTICO'],
-    [/^RCC DOG-LEGGED STAIRWELL.*$/i, 'STAIRWELL'],
-    [/^RCC DOG-LEGGED STAIRCASE.*$/i, 'STAIRCASE'],
-    [/^FORMAL LIVING LOUNGE$/i, 'LIVING LOUNGE'],
-    [/^CENTRAL DINING AREA$/i, 'DINING AREA'],
-    [/^ISHANYA POOJA SANCTUM$/i, 'POOJA SANCTUM'],
-    [/^SANITARY BATH & (TOILET|POWDER)$/i, 'BATH & TOILET'],
-    [/^GROUND SUITE EN-SUITE BATH$/i, 'ATTACHED BATH'],
-    [/^MODULAR GOURMET KITCHEN$/i, 'GOURMET KITCHEN'],
-    [/^GROUND BEDROOM SUITE$/i, 'BEDROOM SUITE']
+    [/^(ENTRANCE\s+)?FOYER\s+&\s+VERANDAH$/i, 'FOYER & VERANDAH'],
+    [/^(COVERED\s+)?CAR\s+PORCH\s+&\s+PORTICO$/i, 'CAR PORCH & PORTICO'],
+    [/^STAIRWELL.*$/i, 'STAIRWELL'],
+    [/^STAIRCASE.*$/i, 'STAIRCASE'],
+    [/^LIVING\s+LOUNGE$/i, 'LIVING LOUNGE'],
+    [/^DINING\s+AREA$/i, 'DINING AREA'],
+    [/^POOJA\s+SANCTUM$/i, 'POOJA SANCTUM'],
+    [/^SANITARY\s+BATH\s+&\s+(TOILET|POWDER)$/i, 'BATH & TOILET'],
+    [/^EN-SUITE\s+BATH$/i, 'ATTACHED BATH'],
+    [/^GOURMET\s+KITCHEN$/i, 'GOURMET KITCHEN'],
+    [/^BEDROOM\s+SUITE$/i, 'BEDROOM SUITE']
   ];
 
   for (const [pattern, repl] of CAD_SIMPLIFICATIONS) {
@@ -807,8 +819,8 @@ export function layoutCadRoomLabel(room, scale = 9.5, columns = [], pxFn = null,
     }
   }
 
-  // Ultra-compact mode for tight spaces (< 75px wide)
-  if (maxAvailW < 75) {
+  // Compact mode for tight spaces (< 100px wide) to prevent label spillover into adjacent rooms
+  if (maxAvailW < 100) {
     rawName = rawName
       .replace(/ & VERANDAH/g, '')
       .replace(/ & PORTICO/g, '')
@@ -820,7 +832,7 @@ export function layoutCadRoomLabel(room, scale = 9.5, columns = [], pxFn = null,
       .replace(/GOURMET /g, '')
       .replace(/ATTACHED /g, '')
       .replace(/ SUITE/g, '')
-      .replace(/RCC /g, '');
+      .replace(/STAIRWELL/g, 'STAIRS');
   }
 
   // Name font size and line wrapping
@@ -856,7 +868,7 @@ export function layoutCadRoomLabel(room, scale = 9.5, columns = [], pxFn = null,
   let dimFontSize = Math.min(7.5, Math.max(5.4, Number((nameFontSize - 0.7).toFixed(1))));
   let dimLines = [];
 
-  if (fullDim.length * dimFontSize * 0.55 <= maxAvailW) {
+  if (fullDim.length * dimFontSize * 0.55 <= (maxAvailW - 8) && maxAvailW >= 100) {
     dimLines = [fullDim];
   } else if (dimStr && sqftStr && maxAvailH >= 34) {
     let dSize = dimFontSize;

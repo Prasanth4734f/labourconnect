@@ -38,6 +38,24 @@ import {
   SIMILARITY_ENGINE_VERSION
 } from './evaluation/similarityEngine.js';
 import {
+  GenerativeArchitectureEngine,
+  generativeArchitectureEngine,
+  GENERATIVE_ENGINE_VERSION
+} from './generator/generativeArchitectureEngine.js';
+import {
+  exploreDesignSpaceCoordinate,
+  generateDesignSpacePool,
+  MASSING_FAMILIES,
+  SPATIAL_TOPOLOGIES,
+  CIRCULATION_CORE_POSITIONS,
+  ENTRANCE_POSITIONS
+} from './generator/designSpaceExplorer.js';
+import {
+  COMPREHENSIVE_ARCHITECTURAL_STYLES,
+  BUILDING_TYPOLOGIES,
+  resolveStyleAndTypology
+} from './generator/architecturalStyleEngine.js';
+import {
   ARCHITECTURAL_STYLES,
   ROOFLINE_STYLES,
   FACADE_MODULATIONS,
@@ -398,7 +416,21 @@ export {
   clearDraft,
   exportProjectBundleJson,
   importProjectBundleJson,
-  resetPersistenceMemoryStore
+  resetPersistenceMemoryStore,
+
+  // 15. Generative Architecture Engine & Design Space Explorer
+  GenerativeArchitectureEngine,
+  generativeArchitectureEngine,
+  GENERATIVE_ENGINE_VERSION,
+  exploreDesignSpaceCoordinate,
+  generateDesignSpacePool,
+  MASSING_FAMILIES,
+  SPATIAL_TOPOLOGIES,
+  CIRCULATION_CORE_POSITIONS,
+  ENTRANCE_POSITIONS,
+  COMPREHENSIVE_ARCHITECTURAL_STYLES,
+  BUILDING_TYPOLOGIES,
+  resolveStyleAndTypology
 };
 
 
@@ -494,7 +526,7 @@ export class LabourConnectDesignEngine {
     const specs = interp.specs;
 
     // 2. Multi-Candidate Search Loop (Guarantees validity & diversity)
-    const MAX_CANDIDATE_ATTEMPTS = 8;
+    const MAX_CANDIDATE_ATTEMPTS = options.maxAttempts || 35;
     let bestCandidate = null;
     let candidateErrors = [];
 
@@ -508,16 +540,27 @@ export class LabourConnectDesignEngine {
     const baseSeed = options.seed !== undefined ? options.seed : (Date.now() + (variationIndex * 1337));
 
     for (let attempt = 0; attempt < MAX_CANDIDATE_ATTEMPTS; attempt++) {
+      const candidateIndex = variationIndex + attempt;
+      const attemptSeed = baseSeed + (attempt * 311);
+      const spaceCoord = exploreDesignSpaceCoordinate(specs, attemptSeed, candidateIndex, {
+        massingFamily: options.massingFamily,
+        spatialTopology: options.spatialTopology,
+        circulationCore: options.circulationCore
+      });
       const currentArchetype = (options.archetype && attempt === 0)
         ? options.archetype
-        : archetypes[(variationIndex + attempt) % archetypes.length];
-      const attemptSeed = baseSeed + (attempt * 311);
+        : spaceCoord.legacyArchetype;
 
-      // Procedural layout generation
+      // Procedural layout generation with varied massing, circulation, and band proportions
       const layout = generateLayout(specs, {
-        variationIndex: variationIndex + attempt,
+        variationIndex: candidateIndex,
         archetype: currentArchetype,
-        seed: attemptSeed
+        seed: attemptSeed,
+        stairOnRight: options.stairOnRight !== undefined ? options.stairOnRight : (spaceCoord.circulationCore === CIRCULATION_CORE_POSITIONS.RIGHT_FLANK),
+        porticoOnLeft: options.porticoOnLeft !== undefined ? options.porticoOnLeft : (spaceCoord.entrancePosition === ENTRANCE_POSITIONS.LEFT_CORNER),
+        flipRear: options.flipRear !== undefined ? options.flipRear : ((attempt % 2) === 1),
+        b1Ratio: spaceCoord.b1Ratio,
+        b2Ratio: spaceCoord.b2Ratio
       });
 
       // Constraint Validation (Boundary, Overlap, Alignment, Adjacency, Standards)
@@ -681,6 +724,53 @@ export class LabourConnectDesignEngine {
       success: true,
       variations: results
     };
+  }
+
+  /**
+   * Generates 100 uniquely fingerprinted, valid architectural designs from the same prompt
+   */
+  generate100UniqueDesigns(rawInputs, options = {}) {
+    return generativeArchitectureEngine.generateDiverseBatch(rawInputs, 100, {
+      ...options,
+      history: options.history || this.history
+    });
+  }
+
+  /**
+   * Generates a batch of distinct, valid architectural designs
+   */
+  generateDiverseBatch(rawInputs, count = 100, options = {}) {
+    return generativeArchitectureEngine.generateDiverseBatch(rawInputs, count, {
+      ...options,
+      history: options.history || this.history
+    });
+  }
+
+  /**
+   * Generates multiple diverse concepts (Mode 2)
+   */
+  generateAlternatives(rawInputs, count = 5, options = {}) {
+    return generativeArchitectureEngine.generateAlternatives(rawInputs, count, {
+      ...options,
+      history: options.history || this.history
+    });
+  }
+
+  /**
+   * Refines a design (Mode 4)
+   */
+  refineDesign(existingDesign, modifications = {}, options = {}) {
+    return generativeArchitectureEngine.refineDesign(existingDesign, modifications, options);
+  }
+
+  /**
+   * Explores distinct interpretations of a style (Mode 5)
+   */
+  exploreStyleInterpretations(rawInputs, styleId, count = 5, options = {}) {
+    return generativeArchitectureEngine.exploreStyleInterpretations(rawInputs, styleId, count, {
+      ...options,
+      history: options.history || this.history
+    });
   }
 
   /**

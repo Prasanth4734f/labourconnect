@@ -392,7 +392,11 @@ export function evaluateHardConstraints(layout, options = {}) {
         absMinW = 5.0;
         absMinL = 7.0;
         absMinA = 50.0;
-      } else if (room.type === ROOM_TYPES.BEDROOM || room.type === ROOM_TYPES.MASTER_BEDROOM || room.type === ROOM_TYPES.DINING) {
+      } else if (room.type === ROOM_TYPES.DINING) {
+        absMinW = 5.5;
+        absMinL = 5.5;
+        absMinA = 40.0;
+      } else if (room.type === ROOM_TYPES.BEDROOM || room.type === ROOM_TYPES.MASTER_BEDROOM) {
         absMinW = 6.5;
         absMinL = 7.5;
         absMinA = 55.0;

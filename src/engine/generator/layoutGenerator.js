@@ -248,8 +248,9 @@ export function generateLayout(specs, options = {}) {
 
   if (isMultiFloor) {
     const stairWidth = Number(Math.min(8.5, Math.max(6.5, bldEnv.width * 0.22)).toFixed(2));
-    const band1L = Number((bldEnv.length * b1Ratio).toFixed(2));
-    const band2L = Number((bldEnv.length * b2Ratio).toFixed(2));
+    const isCompactDepth = bldEnv.length <= 26.0;
+    const band1L = isCompactDepth ? 4.0 : Number((bldEnv.length * b1Ratio).toFixed(2));
+    const band2L = isCompactDepth ? 11.6 : Number((bldEnv.length * b2Ratio).toFixed(2));
     const stairLength = band2L;
 
     // Variation toggles stair placement: right flank vs left flank
@@ -321,6 +322,7 @@ export function generateLayout(specs, options = {}) {
     variationIndex,
     site: {
       ...site,
+      buildableEnvelope: bldEnv,
       buildingEnvelope: bldEnv,
       buildingFootprint: {
         x: bldEnv.x,
@@ -473,15 +475,16 @@ function generateFloorLayout({ floorProg, env, stairwellBounds, archetype, varia
     // Dynamic band proportioning: single-story multi-bedroom requires more depth in Band 3
     const isSingleStoryMultiBed = specs.floorsCount === 1 && (floorProg.rooms || []).filter(r => r.type === ROOM_TYPES.BEDROOM || r.type === ROOM_TYPES.MASTER_BEDROOM).length >= 2;
 
-    let b1Ratio = passedB1 !== undefined ? passedB1 : 0.28;
-    let b2Ratio = passedB2 !== undefined ? passedB2 : 0.42;
+    const isCompactDepth = L <= 26.0;
+    let b1Ratio = passedB1 !== undefined ? passedB1 : (isCompactDepth ? 0.17 : 0.28);
+    let b2Ratio = passedB2 !== undefined ? passedB2 : (isCompactDepth ? 0.50 : 0.42);
 
     const band1Length = isSingleStoryMultiBed
       ? Number(Math.max(5.0, Math.min(6.5, L * 0.16)).toFixed(2))
-      : Number((L * b1Ratio).toFixed(2));
+      : (isCompactDepth ? 4.0 : Number((L * b1Ratio).toFixed(2)));
     const band2Length = isSingleStoryMultiBed
       ? Number(Math.max(10.0, Math.min(13.0, L * 0.34)).toFixed(2))
-      : Number((L * b2Ratio).toFixed(2));
+      : (isCompactDepth ? 11.6 : Number((L * b2Ratio).toFixed(2)));
     const band3Length = Number((L - (band1Length + band2Length)).toFixed(2));
 
     const yBand1 = env.y;
@@ -617,12 +620,43 @@ function generateFloorLayout({ floorProg, env, stairwellBounds, archetype, varia
         doors: [{ x: Number((diningX + diningW / 2).toFixed(2)), y: Number((yBand2 + band2Length).toFixed(2)), width: 3.0, wall: 'south', label: 'Kitchen Door' }],
         windows: [{ x: Number((diningX + diningW).toFixed(2)), y: Number((yBand2 + band2Length / 2).toFixed(2)), width: 4.5, wall: 'east' }]
       }));
+    } else if (midAvailableW < 13.0) {
+      // Narrow Plot Adaptation: Stack Living and Dining along length
+      const livingL = Number((band2Length * 0.54).toFixed(2));
+      const diningL = Number((band2Length - livingL).toFixed(2));
+      const yLiving = yBand2;
+      const yDining = Number((yBand2 + livingL).toFixed(2));
+
+      rooms.push(createPlacedRoom({
+        id: 'g_living',
+        name: 'Formal Living Lounge',
+        type: ROOM_TYPES.LIVING,
+        zone: ZONES.PUBLIC,
+        bounds: { x: midLeftX, y: yLiving, width: midAvailableW, length: livingL },
+        finish: 'Italian Statuario Marble',
+        orientation: 'North-East',
+        doors: [{ x: Number((midLeftX + midAvailableW / 2).toFixed(2)), y: yDining, width: 3.2, wall: 'south', label: 'Arch to Dining' }],
+        windows: [{ x: midLeftX, y: Number((yLiving + livingL / 2).toFixed(2)), width: 4.5, wall: 'west' }]
+      }));
+
+      rooms.push(createPlacedRoom({
+        id: 'g_dining',
+        name: 'Central Dining Area',
+        type: ROOM_TYPES.DINING,
+        zone: ZONES.SEMI_PRIVATE,
+        bounds: { x: midLeftX, y: yDining, width: midAvailableW, length: diningL },
+        finish: 'Polished Vitrified 800×1600mm',
+        orientation: 'East',
+        doors: [{ x: Number((midLeftX + midAvailableW / 2).toFixed(2)), y: Number((yBand2 + band2Length).toFixed(2)), width: 3.0, wall: 'south', label: 'Kitchen Door' }],
+        windows: [{ x: midLeftX, y: Number((yDining + diningL / 2).toFixed(2)), width: 4.0, wall: 'west' }]
+      }));
     } else {
-      const livingRatio = (archetype === SPATIAL_ARCHETYPES.VILLA_PAVILION || variationIndex % 3 === 2) ? 0.48 : 0.58;
+      const flipLD = options.flipLivingDining !== undefined ? Boolean(options.flipLivingDining) : ((variationIndex % 2) === 1);
+      const livingRatio = (archetype === SPATIAL_ARCHETYPES.VILLA_PAVILION || variationIndex % 3 === 2) ? 0.48 : 0.56;
       livingW = Number((midAvailableW * livingRatio).toFixed(2));
       diningW = Number((midAvailableW - livingW).toFixed(2));
-      livingX = midLeftX;
-      diningX = Number((midLeftX + livingW).toFixed(2));
+      livingX = flipLD ? Number((midLeftX + diningW).toFixed(2)) : midLeftX;
+      diningX = flipLD ? midLeftX : Number((midLeftX + livingW).toFixed(2));
 
       rooms.push(createPlacedRoom({
         id: 'g_living',
@@ -652,8 +686,8 @@ function generateFloorLayout({ floorProg, env, stairwellBounds, archetype, varia
     const isPoojaDisabled = specs.amenities?.hasPooja === false || specs.hasPooja === false;
     const shouldIncludePooja = !isPoojaDisabled && (specs.amenities?.hasPooja === true || specs.hasPooja === true || floorProg.rooms?.some(r => r.type === ROOM_TYPES.POOJA));
     if (shouldIncludePooja) {
-      const poojaW = Number(Math.min(6, diningW * 0.45).toFixed(2));
-      const poojaL = Number(Math.min(6, band2Length * 0.35).toFixed(2));
+      const poojaW = Number(Math.max(3.0, Math.min(6.0, diningW * 0.45)).toFixed(2));
+      const poojaL = Number(Math.max(3.0, Math.min(6.0, band2Length * 0.35)).toFixed(2));
       rooms.push(createPlacedRoom({
         id: 'g_pooja',
         name: 'Ishanya Pooja Sanctum',
@@ -811,10 +845,14 @@ function generateFloorLayout({ floorProg, env, stairwellBounds, archetype, varia
         const kitchenW = Number((remainingW * 0.42).toFixed(2));
         const bedW = Number((remainingW - kitchenW).toFixed(2));
 
-        const kitchenX = env.x;
-        const bathCommonX = Number((kitchenX + kitchenW).toFixed(2));
-        const bathSuiteX = Number((bathCommonX + bathCommonW).toFixed(2));
-        const bedX = Number((bathSuiteX + bathSuiteW).toFixed(2));
+        const flipRear = options.flipRear !== undefined
+          ? Boolean(options.flipRear)
+          : (((Math.floor(variationIndex / 3) + variationIndex) % 3) === 2);
+
+        const kitchenX = flipRear ? Number((env.x + bedW + bathSuiteW + bathCommonW).toFixed(2)) : env.x;
+        const bathCommonX = flipRear ? Number((env.x + bedW + bathSuiteW).toFixed(2)) : Number((kitchenX + kitchenW).toFixed(2));
+        const bathSuiteX = flipRear ? Number((env.x + bedW).toFixed(2)) : Number((bathCommonX + bathCommonW).toFixed(2));
+        const bedX = flipRear ? env.x : Number((bathSuiteX + bathSuiteW).toFixed(2));
 
         rooms.push(createPlacedRoom({
           id: 'g_kitchen',
@@ -938,18 +976,23 @@ function generateFloorLayout({ floorProg, env, stairwellBounds, archetype, varia
     // Mutually disjoint functional bands aligned with vertical stair core
     // -----------------------------------------------------------------------
     // Dynamic band proportioning aligned with ground functional core
-    const fb1Ratio = passedB1 !== undefined ? passedB1 : 0.28;
-    const fb2Ratio = passedB2 !== undefined ? passedB2 : 0.42;
+    const isCompactDepth = L <= 26.0;
+    const fb1Ratio = passedB1 !== undefined ? passedB1 : (isCompactDepth ? 0.17 : 0.28);
+    const fb2Ratio = passedB2 !== undefined ? passedB2 : (isCompactDepth ? 0.50 : 0.42);
 
-    const band1Length = Number((L * fb1Ratio).toFixed(2));
-    const band2Length = Number((L * fb2Ratio).toFixed(2));
+    const band1Length = isCompactDepth ? 4.0 : Number((L * fb1Ratio).toFixed(2));
+    const band2Length = isCompactDepth ? 11.6 : Number((L * fb2Ratio).toFixed(2));
     const band3Length = Number((L - (band1Length + band2Length)).toFixed(2));
 
     const yBand1 = env.y;
     const yBand2 = Number((env.y + band1Length).toFixed(2));
     const yBand3 = Number((yBand2 + band2Length).toFixed(2));
 
-    // --- BAND 1: FRONT BALCONY & FAMILY MEDIA LOUNGE ---
+    // --- BAND 1: FRONT BALCONY & FAMILY MEDIA LOUNGE / MASTER SUITE ---
+    const upperMasterFront = options.upperMasterFront !== undefined
+      ? Boolean(options.upperMasterFront)
+      : (((Math.floor(variationIndex / 4) + variationIndex) % 2) === 1);
+
     const isBalconyDisabled = specs.amenities?.hasBalcony === false ||
       specs.hasBalcony === false ||
       specs.balcony === false ||
@@ -962,12 +1005,25 @@ function generateFloorLayout({ floorProg, env, stairwellBounds, archetype, varia
       floorProg.rooms?.some(r => r.type === ROOM_TYPES.BALCONY)
     );
 
-    if (shouldIncludeBalcony) {
+    if (band1Length < 6.5) {
+      // Compact Depth: Dedicated Balcony Deck spanning entire front band
+      rooms.push(createPlacedRoom({
+        id: 'f_balcony',
+        name: 'Cantilever Glass Balcony Deck',
+        type: ROOM_TYPES.BALCONY,
+        zone: ZONES.OUTDOOR,
+        bounds: { x: env.x, y: yBand1, width: W, length: band1Length },
+        finish: 'Weatherproof WPC Wood Planks',
+        orientation: specs.facingDirection || 'East',
+        doors: [{ x: Number((env.x + W / 2).toFixed(2)), y: Number((yBand1 + band1Length).toFixed(2)), width: 4.5, wall: 'south', label: 'Glass Sliding Door' }],
+        windows: []
+      }));
+    } else if (shouldIncludeBalcony) {
       const isDeepTerrace = archetype === SPATIAL_ARCHETYPES.VILLA_PAVILION || (((Math.floor(variationIndex / 2) + variationIndex) % 2) === 0);
       const balconyL = isDeepTerrace && band1Length >= 14.0
         ? Number(Math.max(7.5, Math.min(11.0, band1Length * 0.55)).toFixed(2))
         : Number(Math.min(5.0, band1Length * 0.35).toFixed(2));
-      const loungeL = Number((band1Length - balconyL).toFixed(2));
+      const frontRoomL = Number((band1Length - balconyL).toFixed(2));
 
       rooms.push(createPlacedRoom({
         id: 'f_balcony',
@@ -981,40 +1037,73 @@ function generateFloorLayout({ floorProg, env, stairwellBounds, archetype, varia
         windows: []
       }));
 
-      rooms.push(createPlacedRoom({
-        id: 'f_family_lounge',
-        name: 'Family Media Lounge & Library',
-        type: ROOM_TYPES.LIVING,
-        zone: ZONES.SEMI_PRIVATE,
-        bounds: { x: env.x, y: Number((yBand1 + balconyL).toFixed(2)), width: W, length: loungeL },
-        finish: 'Italian Vitrified 800×1600mm',
-        orientation: 'North',
-        doors: [{ x: Number((env.x + W / 2).toFixed(2)), y: yBand2, width: 3.2, wall: 'south' }],
-        windows: [{ x: env.x, y: Number((yBand1 + balconyL + loungeL / 2).toFixed(2)), width: 5.0, wall: 'west' }]
-      }));
+      if (upperMasterFront) {
+        rooms.push(createPlacedRoom({
+          id: 'f_master_suite',
+          name: 'Master Penthouse Suite',
+          type: ROOM_TYPES.MASTER_BEDROOM,
+          zone: ZONES.PRIVATE,
+          bounds: { x: env.x, y: Number((yBand1 + balconyL).toFixed(2)), width: W, length: frontRoomL },
+          finish: 'Engineered Teak Hardwood',
+          orientation: specs.facingDirection || 'East',
+          doors: [
+            { x: Number((env.x + W / 2).toFixed(2)), y: Number((yBand1 + balconyL).toFixed(2)), width: 5.0, wall: 'north', label: 'Balcony Portal' },
+            { x: Number((env.x + W / 2).toFixed(2)), y: yBand2, width: 3.2, wall: 'south' }
+          ],
+          windows: [{ x: env.x, y: Number((yBand1 + balconyL + frontRoomL / 2).toFixed(2)), width: 5.0, wall: 'west' }]
+        }));
+      } else {
+        rooms.push(createPlacedRoom({
+          id: 'f_family_lounge',
+          name: 'Family Media Lounge & Library',
+          type: ROOM_TYPES.LIVING,
+          zone: ZONES.SEMI_PRIVATE,
+          bounds: { x: env.x, y: Number((yBand1 + balconyL).toFixed(2)), width: W, length: frontRoomL },
+          finish: 'Italian Vitrified 800×1600mm',
+          orientation: 'North',
+          doors: [{ x: Number((env.x + W / 2).toFixed(2)), y: yBand2, width: 3.2, wall: 'south' }],
+          windows: [{ x: env.x, y: Number((yBand1 + balconyL + frontRoomL / 2).toFixed(2)), width: 5.0, wall: 'west' }]
+        }));
+      }
     } else {
-      // Balcony excluded: Family Media Lounge spans the entire front band
-      rooms.push(createPlacedRoom({
-        id: 'f_family_lounge',
-        name: 'Family Media Lounge & Library',
-        type: ROOM_TYPES.LIVING,
-        zone: ZONES.SEMI_PRIVATE,
-        bounds: { x: env.x, y: yBand1, width: W, length: band1Length },
-        finish: 'Italian Vitrified 800×1600mm',
-        orientation: 'North',
-        doors: [{ x: Number((env.x + W / 2).toFixed(2)), y: yBand2, width: 3.2, wall: 'south' }],
-        windows: [
-          { x: env.x, y: Number((yBand1 + band1Length / 2).toFixed(2)), width: 5.0, wall: 'west' },
-          { x: Number((env.x + W / 2).toFixed(2)), y: yBand1, width: 6.0, wall: 'north', label: 'Panoramic Window' }
-        ]
-      }));
+      if (upperMasterFront) {
+        rooms.push(createPlacedRoom({
+          id: 'f_master_suite',
+          name: 'Master Penthouse Suite',
+          type: ROOM_TYPES.MASTER_BEDROOM,
+          zone: ZONES.PRIVATE,
+          bounds: { x: env.x, y: yBand1, width: W, length: band1Length },
+          finish: 'Engineered Teak Hardwood',
+          orientation: specs.facingDirection || 'North',
+          doors: [{ x: Number((env.x + W / 2).toFixed(2)), y: yBand2, width: 3.2, wall: 'south' }],
+          windows: [
+            { x: env.x, y: Number((yBand1 + band1Length / 2).toFixed(2)), width: 5.0, wall: 'west' },
+            { x: Number((env.x + W / 2).toFixed(2)), y: yBand1, width: 6.0, wall: 'north', label: 'Panoramic Window' }
+          ]
+        }));
+      } else {
+        rooms.push(createPlacedRoom({
+          id: 'f_family_lounge',
+          name: 'Family Media Lounge & Library',
+          type: ROOM_TYPES.LIVING,
+          zone: ZONES.SEMI_PRIVATE,
+          bounds: { x: env.x, y: yBand1, width: W, length: band1Length },
+          finish: 'Italian Vitrified 800×1600mm',
+          orientation: 'North',
+          doors: [{ x: Number((env.x + W / 2).toFixed(2)), y: yBand2, width: 3.2, wall: 'south' }],
+          windows: [
+            { x: env.x, y: Number((yBand1 + band1Length / 2).toFixed(2)), width: 5.0, wall: 'west' },
+            { x: Number((env.x + W / 2).toFixed(2)), y: yBand1, width: 6.0, wall: 'north', label: 'Panoramic Window' }
+          ]
+        }));
+      }
     }
 
-    // --- BAND 2: STAIRWELL CORE & MASTER BEDROOM SUITE ---
+    // --- BAND 2: STAIRWELL CORE & (MASTER BEDROOM or UPPER LOUNGE) ---
     const stairXLocal = stairwellBounds ? stairwellBounds.x : env.x;
-    const isStairRight = stairXLocal > env.x + W / 2;
+    const isStairRight = stairwellBounds ? (stairwellBounds.x > env.x + W / 2) : false;
     const midAvailableW = stairwellBounds ? Number((W - stairwellBounds.width).toFixed(2)) : W;
-    const masterSuiteX = isStairRight ? env.x : (stairwellBounds ? Number((env.x + stairwellBounds.width).toFixed(2)) : env.x);
+    const midRoomX = isStairRight ? env.x : (stairwellBounds ? Number((env.x + stairwellBounds.width).toFixed(2)) : env.x);
 
     if (stairwellBounds) {
       rooms.push(createPlacedRoom({
@@ -1030,29 +1119,53 @@ function generateFloorLayout({ floorProg, env, stairwellBounds, archetype, varia
       }));
     }
 
-    rooms.push(createPlacedRoom({
-      id: 'f_master_suite',
-      name: 'Master Penthouse Suite',
-      type: ROOM_TYPES.MASTER_BEDROOM,
-      zone: ZONES.PRIVATE,
-      bounds: { x: masterSuiteX, y: yBand2, width: midAvailableW, length: band2Length },
-      finish: 'Engineered Teak Hardwood',
-      orientation: 'South-West',
-      doors: [
-        { x: Number((masterSuiteX + midAvailableW / 2).toFixed(2)), y: yBand2, width: 3.2, wall: 'north' },
-        { x: Number((masterSuiteX + midAvailableW / 2).toFixed(2)), y: yBand3, width: 2.8, wall: 'south', label: 'En-suite Portal' }
-      ],
-      windows: [
-        { x: isStairRight ? masterSuiteX : Number((masterSuiteX + midAvailableW).toFixed(2)), y: Number((yBand2 + band2Length / 2).toFixed(2)), width: 6.0, wall: isStairRight ? 'west' : 'east' }
-      ]
-    }));
+    if (upperMasterFront) {
+      rooms.push(createPlacedRoom({
+        id: 'f_family_lounge',
+        name: 'Upper Living & Study Lounge',
+        type: ROOM_TYPES.LIVING,
+        zone: ZONES.SEMI_PRIVATE,
+        bounds: { x: midRoomX, y: yBand2, width: midAvailableW, length: band2Length },
+        finish: 'Italian Vitrified 800×1600mm',
+        orientation: 'Central',
+        doors: [
+          { x: Number((midRoomX + midAvailableW / 2).toFixed(2)), y: yBand2, width: 3.2, wall: 'north' },
+          { x: Number((midRoomX + midAvailableW / 2).toFixed(2)), y: yBand3, width: 2.8, wall: 'south' }
+        ],
+        windows: [
+          { x: isStairRight ? midRoomX : Number((midRoomX + midAvailableW).toFixed(2)), y: Number((yBand2 + band2Length / 2).toFixed(2)), width: 6.0, wall: isStairRight ? 'west' : 'east' }
+        ]
+      }));
+    } else {
+      rooms.push(createPlacedRoom({
+        id: 'f_master_suite',
+        name: 'Master Penthouse Suite',
+        type: ROOM_TYPES.MASTER_BEDROOM,
+        zone: ZONES.PRIVATE,
+        bounds: { x: midRoomX, y: yBand2, width: midAvailableW, length: band2Length },
+        finish: 'Engineered Teak Hardwood',
+        orientation: 'South-West',
+        doors: [
+          { x: Number((midRoomX + midAvailableW / 2).toFixed(2)), y: yBand2, width: 3.2, wall: 'north' },
+          { x: Number((midRoomX + midAvailableW / 2).toFixed(2)), y: yBand3, width: 2.8, wall: 'south', label: 'En-suite Portal' }
+        ],
+        windows: [
+          { x: isStairRight ? midRoomX : Number((midRoomX + midAvailableW).toFixed(2)), y: Number((yBand2 + band2Length / 2).toFixed(2)), width: 6.0, wall: isStairRight ? 'west' : 'east' }
+        ]
+      }));
+    }
 
     // --- BAND 3: REAR MASTER EN-SUITE BATH & UPPER BEDROOM(S) ---
+    const flipUpperRear = options.flipUpperRear !== undefined
+      ? Boolean(options.flipUpperRear)
+      : (((Math.floor(variationIndex / 3) + variationIndex) % 2) === 1);
+
     const masterBathW = Number(Math.min(8.0, W * 0.30).toFixed(2));
     const remainingRearW = Number((W - masterBathW).toFixed(2));
 
-    const masterBathX = isStairRight ? env.x : Number((env.x + remainingRearW).toFixed(2));
-    const bed2X = isStairRight ? Number((env.x + masterBathW).toFixed(2)) : env.x;
+    const bathOnLeft = flipUpperRear ? !isStairRight : isStairRight;
+    const masterBathX = bathOnLeft ? env.x : Number((env.x + remainingRearW).toFixed(2));
+    const bed2X = bathOnLeft ? Number((env.x + masterBathW).toFixed(2)) : env.x;
 
     rooms.push(createPlacedRoom({
       id: 'f_master_bath',
@@ -1067,7 +1180,6 @@ function generateFloorLayout({ floorProg, env, stairwellBounds, archetype, varia
     }));
 
     if (specs.bhkCount >= 4) {
-      // Split remaining rear width into Bedroom 2 and Bedroom 3
       const halfW = Number((remainingRearW / 2).toFixed(2));
       rooms.push(createPlacedRoom({
         id: 'f_bed_2',
@@ -1093,17 +1205,15 @@ function generateFloorLayout({ floorProg, env, stairwellBounds, archetype, varia
         windows: [{ x: Number((bed2X + halfW + (remainingRearW - halfW) / 2).toFixed(2)), y: Number((yBand3 + band3Length).toFixed(2)), width: 4.5, wall: 'south' }]
       }));
     } else {
-      // 3BHK: Check if upper floor needs Bedroom 2 + Bathroom 2
       const needsTwoUpperBaths = (specs.bathroomsCount >= 3) ||
         (floorProg.rooms?.filter(r => r.type === ROOM_TYPES.BATHROOM).length >= 2);
 
       if (needsTwoUpperBaths && remainingRearW >= 15.0) {
-        // Allocate both Bedroom 2 and Bedroom 2 Bathroom
         const bath2W = Number(Math.max(4.5, Math.min(6.5, remainingRearW * 0.26)).toFixed(2));
         const bed2W = Number((remainingRearW - bath2W).toFixed(2));
 
-        const bath2X = isStairRight ? bed2X : Number((bed2X + bed2W).toFixed(2));
-        const actualBed2X = isStairRight ? Number((bed2X + bath2W).toFixed(2)) : bed2X;
+        const bath2X = bathOnLeft ? bed2X : Number((bed2X + bed2W).toFixed(2));
+        const actualBed2X = bathOnLeft ? Number((bed2X + bath2W).toFixed(2)) : bed2X;
 
         rooms.push(createPlacedRoom({
           id: 'f_bath_bed2',
@@ -1129,7 +1239,6 @@ function generateFloorLayout({ floorProg, env, stairwellBounds, archetype, varia
           windows: [{ x: Number((actualBed2X + bed2W / 2).toFixed(2)), y: Number((yBand3 + band3Length).toFixed(2)), width: 5.0, wall: 'south' }]
         }));
       } else {
-        // Single spacious Bedroom 2 upstairs
         rooms.push(createPlacedRoom({
           id: 'f_bed_2',
           name: 'Children / Study Bedroom Suite',
@@ -1143,7 +1252,7 @@ function generateFloorLayout({ floorProg, env, stairwellBounds, archetype, varia
         }));
       }
     }
-  } else if (!isTerrace && floorProg.floorIndex >= 2) {
+    } else if (!isTerrace && floorProg.floorIndex >= 2) {
     // -----------------------------------------------------------------------
     // INTERMEDIATE UPPER FLOOR PROCEDURAL PACKING (Levels 2, 3, 4, 5, etc.)
     // Vertically aligned stairwell core + Front Balcony/Terrace + Suites + Baths

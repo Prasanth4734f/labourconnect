@@ -631,7 +631,7 @@ export function deriveDimensionChains(site, envelope, rooms = []) {
   const setbacks = site?.setbacks || { front: 5, rear: 4, left: 3, right: 3 };
 
   // 1. Tier 1: Overall Plot Boundary Dimension Chains
-  const plotDimensions = [
+  const plotSegments = [
     {
       id: 'dim_plot_w',
       label: `${plotW.toFixed(1)}′ 0″`,
@@ -653,8 +653,16 @@ export function deriveDimensionChains(site, envelope, rooms = []) {
       witnessEnd: { x: 0, y: plotL }
     }
   ];
+  const plotDimensions = Object.create(Array.prototype);
+  plotDimensions[0] = plotSegments[0];
+  plotDimensions[1] = plotSegments[1];
+  plotDimensions.segments = plotSegments;
   plotDimensions.width = plotW;
   plotDimensions.length = plotL;
+  plotDimensions[Symbol.iterator] = function* () {
+    yield plotSegments[0];
+    yield plotSegments[1];
+  };
 
   // 2. Tier 2: Municipal Setback Clearances
   const setbackDimensions = [
@@ -697,7 +705,7 @@ export function deriveDimensionChains(site, envelope, rooms = []) {
   setbackDimensions.right = Number(setbacks.right);
 
   // 3. Tier 3: Building Footprint Dimensions
-  const buildingDimensions = [
+  const buildingSegments = [
     {
       id: 'dim_bldg_w',
       label: `${Number(env.width).toFixed(1)}′ 0″`,
@@ -719,8 +727,18 @@ export function deriveDimensionChains(site, envelope, rooms = []) {
       witnessEnd: { x: env.x, y: Number((env.y + env.length).toFixed(2)) }
     }
   ];
+  const buildingDimensions = Object.create(Array.prototype);
+  buildingDimensions[0] = buildingSegments[0];
+  buildingDimensions[1] = buildingSegments[1];
+  buildingDimensions.segments = buildingSegments;
   buildingDimensions.width = Number(env.width);
   buildingDimensions.length = Number(env.length);
+  buildingDimensions.plinthWidth = Number(env.width);
+  buildingDimensions.plinthLength = Number(env.length);
+  buildingDimensions[Symbol.iterator] = function* () {
+    yield buildingSegments[0];
+    yield buildingSegments[1];
+  };
 
   // 4. Tier 4: Room Internal Clear Dimensions
   const roomDimensions = rooms.map(r => {
@@ -834,6 +852,15 @@ export function layoutCadRoomLabel(room, scale = 9.5, columns = [], pxFn = null,
       .replace(/ SUITE/g, '')
       .replace(/STAIRWELL/g, 'STAIRS');
   }
+  if (maxAvailW < 75) {
+    rawName = rawName
+      .replace(/^GROUND\s+BEDROOM$/i, 'BEDROOM')
+      .replace(/^BEDROOM\s+SUITE$/i, 'BEDROOM')
+      .replace(/^CHILDREN\s+.*2$/i, 'BED 2')
+      .replace(/^GUEST\s+.*3$/i, 'BED 3')
+      .replace(/^BATH\s+.*$/i, 'BATH')
+      .replace(/^CAR\s+PORCH$/i, 'PORCH');
+  }
 
   // Name font size and line wrapping
   let targetFontSize = maxAvailW > 120 ? 9.2 : maxAvailW > 75 ? 8.2 : 7.0;
@@ -931,6 +958,7 @@ export function layoutCadRoomLabel(room, scale = 9.5, columns = [], pxFn = null,
 
   let currentLineIdx = 0;
   for (const nl of nameLines) {
+    const estW = nl.length * nameFontSize * 0.58;
     renderedLines.push({
       text: nl,
       x: cx,
@@ -938,7 +966,8 @@ export function layoutCadRoomLabel(room, scale = 9.5, columns = [], pxFn = null,
       fontSize: nameFontSize,
       fontWeight: '800',
       color: CAD_COLORS.ROOM_LABEL,
-      type: 'name'
+      type: 'name',
+      textLength: estW > (maxAvailW - 6) ? Math.round(maxAvailW - 8) : null
     });
     currentLineIdx++;
   }
@@ -1342,7 +1371,8 @@ export function generateFloorPlanSvg(design, options = {}) {
       svgParts.push(`      <rect x="${bx}" y="${by}" width="${bw}" height="${bh}" rx="4" fill="rgba(255, 255, 255, 0.94)" stroke="#CBD5E1" stroke-width="0.8" />\n`);
 
       layout.renderedLines.forEach(line => {
-        svgParts.push(`      <text x="${line.x}" y="${line.y}" text-anchor="middle" dominant-baseline="central" font-size="${line.fontSize}" font-weight="${line.fontWeight}" fill="${line.color}">${line.text}</text>\n`);
+        const textLen = line.textLength ? ` textLength="${line.textLength}" lengthAdjust="spacingAndGlyphs"` : '';
+        svgParts.push(`      <text x="${line.x}" y="${line.y}" text-anchor="middle" dominant-baseline="central" font-size="${line.fontSize}" font-weight="${line.fontWeight}" fill="${line.color}"${textLen}>${line.text}</text>\n`);
       });
       svgParts.push(`    </g>\n`);
     });

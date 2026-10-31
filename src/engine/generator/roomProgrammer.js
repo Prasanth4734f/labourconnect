@@ -788,10 +788,25 @@ export function generateRoomProgram(input, options = {}) {
   }
 
   // Validate Ground Floor Capacity: Enclosed rooms require internal circulation & masonry allowance
-  const groundEnclosedCarpet = groundRooms.filter(r => r.zone !== ZONES.OUTDOOR).reduce((sum, r) => sum + r.minArea, 0);
-  const groundOutdoorCarpet = groundRooms.filter(r => r.zone === ZONES.OUTDOOR).reduce((sum, r) => sum + r.minArea, 0);
-  const groundNetCarpet = groundEnclosedCarpet + groundOutdoorCarpet;
-  const groundGrossRequired = Math.round(groundEnclosedCarpet * CIRCULATION_WALL_FACTOR) + groundOutdoorCarpet;
+  let groundEnclosedCarpet = groundRooms.filter(r => r.zone !== ZONES.OUTDOOR).reduce((sum, r) => sum + r.minArea, 0);
+  let groundOutdoorCarpet = groundRooms.filter(r => r.zone === ZONES.OUTDOOR).reduce((sum, r) => sum + r.minArea, 0);
+  let groundNetCarpet = groundEnclosedCarpet + groundOutdoorCarpet;
+  let groundGrossRequired = Math.round(groundEnclosedCarpet * CIRCULATION_WALL_FACTOR) + groundOutdoorCarpet;
+
+  if (groundGrossRequired > buildableEnv.area && buildableEnv.area >= 280) {
+    const scale = Math.max(0.70, ((buildableEnv.area - groundOutdoorCarpet) * 0.95) / (groundEnclosedCarpet * CIRCULATION_WALL_FACTOR));
+    groundRooms.forEach(r => {
+      if (r.zone !== ZONES.OUTDOOR) {
+        r.minArea = Math.round(r.minArea * scale);
+        r.preferredArea = Math.round(r.preferredArea * scale);
+        r.minWidth = Number((r.minWidth * Math.sqrt(scale)).toFixed(1));
+        r.minLength = Number((r.minLength * Math.sqrt(scale)).toFixed(1));
+      }
+    });
+    groundEnclosedCarpet = groundRooms.filter(r => r.zone !== ZONES.OUTDOOR).reduce((sum, r) => sum + r.minArea, 0);
+    groundGrossRequired = Math.round(groundEnclosedCarpet * CIRCULATION_WALL_FACTOR) + groundOutdoorCarpet;
+    groundNetCarpet = groundEnclosedCarpet + groundOutdoorCarpet;
+  }
 
   if (groundGrossRequired > buildableEnv.area) {
     errors.push(
@@ -1155,10 +1170,25 @@ export function generateRoomProgram(input, options = {}) {
     }
 
     // Validate First Floor Capacity: Enclosed rooms require internal circulation & masonry allowance
-    const firstEnclosedCarpet = firstRooms.filter(r => r.zone !== ZONES.OUTDOOR).reduce((sum, r) => sum + r.minArea, 0);
-    const firstOutdoorCarpet = firstRooms.filter(r => r.zone === ZONES.OUTDOOR).reduce((sum, r) => sum + r.minArea, 0);
-    const firstNetCarpet = firstEnclosedCarpet + firstOutdoorCarpet;
-    const firstGrossRequired = Math.round(firstEnclosedCarpet * CIRCULATION_WALL_FACTOR) + firstOutdoorCarpet;
+    let firstEnclosedCarpet = firstRooms.filter(r => r.zone !== ZONES.OUTDOOR).reduce((sum, r) => sum + r.minArea, 0);
+    let firstOutdoorCarpet = firstRooms.filter(r => r.zone === ZONES.OUTDOOR).reduce((sum, r) => sum + r.minArea, 0);
+    let firstNetCarpet = firstEnclosedCarpet + firstOutdoorCarpet;
+    let firstGrossRequired = Math.round(firstEnclosedCarpet * CIRCULATION_WALL_FACTOR) + firstOutdoorCarpet;
+
+    if (firstGrossRequired > buildableEnv.area && buildableEnv.area >= 280) {
+      const scale = Math.max(0.70, ((buildableEnv.area - firstOutdoorCarpet) * 0.95) / (firstEnclosedCarpet * CIRCULATION_WALL_FACTOR));
+      firstRooms.forEach(r => {
+        if (r.zone !== ZONES.OUTDOOR) {
+          r.minArea = Math.round(r.minArea * scale);
+          r.preferredArea = Math.round(r.preferredArea * scale);
+          r.minWidth = Number((r.minWidth * Math.sqrt(scale)).toFixed(1));
+          r.minLength = Number((r.minLength * Math.sqrt(scale)).toFixed(1));
+        }
+      });
+      firstEnclosedCarpet = firstRooms.filter(r => r.zone !== ZONES.OUTDOOR).reduce((sum, r) => sum + r.minArea, 0);
+      firstGrossRequired = Math.round(firstEnclosedCarpet * CIRCULATION_WALL_FACTOR) + firstOutdoorCarpet;
+      firstNetCarpet = firstEnclosedCarpet + firstOutdoorCarpet;
+    }
 
     if (firstGrossRequired > buildableEnv.area) {
       errors.push(

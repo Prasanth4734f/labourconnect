@@ -118,7 +118,16 @@ export function compileLayoutRequirements(rawInput, options = {}) {
     };
   }
 
-  const buildableEnv = envRes.buildableEnvelope;
+  const buildableEnv = { ...envRes.buildableEnvelope };
+  if (plotAreaRes.plotAreaSqft > 8000) {
+    const maxVillaW = Math.min(buildableEnv.width, Math.max(32, 26 + (req.bhkCount || 3) * 3));
+    const maxVillaL = Math.min(buildableEnv.length, Math.max(38, 30 + (req.bhkCount || 3) * 4));
+    buildableEnv.width = Math.min(40, maxVillaW);
+    buildableEnv.length = Math.min(48, maxVillaL);
+    buildableEnv.x = Math.round((plotWidthFt - buildableEnv.width) / 2);
+    buildableEnv.y = Math.round(defaultSetbacks.front + 15);
+    buildableEnv.areaSqft = buildableEnv.width * buildableEnv.length;
+  }
   const floorsCount = req.floorsCount || 1;
   const maxFloorBuildableSqft = buildableEnv.areaSqft;
   const maxTotalBuildableSqft = maxFloorBuildableSqft * floorsCount;

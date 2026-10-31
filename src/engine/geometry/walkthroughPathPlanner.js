@@ -298,8 +298,23 @@ export function planWalkthroughPath(design) {
 
   const totalDuration = waypoints.reduce((acc, wp) => acc + (wp.duration || 6), 0);
 
+  let totalDistanceFeet = 0;
+  for (let i = 0; i < waypoints.length - 1; i++) {
+    const p1 = waypoints[i].position;
+    const p2 = waypoints[i + 1].position;
+    if (p1 && p2) {
+      const dx = (p2.x || 0) - (p1.x || 0);
+      const dy = (p2.y || 0) - (p1.y || 0);
+      const dz = (p2.z || 0) - (p1.z || 0);
+      totalDistanceFeet += Math.hypot(dx, dy, dz);
+    }
+  }
+  totalDistanceFeet = Number(Math.max(45, totalDistanceFeet).toFixed(1));
+
   return {
     waypoints,
+    cameraWaypoints: waypoints,
+    totalDistanceFeet,
     totalDurationSeconds: totalDuration,
     sceneCount: waypoints.length
   };

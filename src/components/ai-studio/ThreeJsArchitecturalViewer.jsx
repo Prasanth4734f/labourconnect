@@ -932,7 +932,7 @@ const ThreeJsArchitecturalViewer = forwardRef(function ThreeJsArchitecturalViewe
     // and physical fixtures, replacing primitive rectangular boxes.
     // =========================================================================
     if (furnitureGroupRef.current) {
-      let itemsToPlace = design?.interiorFurnishings?.allFurnitureItems;
+      let itemsToPlace = design?.furnishings?.allFurnitureItems || design?.interiorFurnishings?.allFurnitureItems;
       if (!itemsToPlace || itemsToPlace.length === 0) {
         try {
           const fitout = generateDesignFurniture(design);

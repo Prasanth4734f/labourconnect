@@ -31,6 +31,7 @@ import {
   getAreaRugTexture
 } from './architecturalMaterialSystem.js';
 import { simplifyRoomName } from './architecturalRoomUtils.js';
+import { buildRealisticModel } from '../../engine/interior/assetLoaderService.js';
 
 /**
  * Visuals5dStudio
@@ -584,16 +585,42 @@ export default function Visuals5dStudio({
       houseGroup.add(glassMesh);
     });
 
-    // H. FURNITURE (PROCEDURAL GLB EQUIVALENT RIGID PRIMITIVES)
+    // H. FURNITURE (REALISTIC 3D ARCHITECTURAL ASSETS)
     if (showFurniture) {
+      const archStyle = design?.inputs?.archStyle || design?.metadata?.style || 'contemporary';
       scene5d.elements.furniture.forEach(item => {
         if (activeFloorFilter !== 'all' && item.floorIndex !== undefined && item.floorIndex > Number(activeFloorFilter)) return;
-        const fMat = new THREE.MeshStandardMaterial({
-          color: item.color || '#e2e8f0',
-          roughness: 0.6,
-          metalness: 0.05
-        });
-        furnitureGroup.add(makeBoxMesh(item.bounds, fMat, true, true));
+        
+        const b = item.bounds;
+        if (!b) return;
+        const width = Math.max(0.5, b.maxX - b.minX);
+        const depth = Math.max(0.5, b.maxZ - b.minZ);
+        const height = Math.max(0.5, b.maxY - b.minY);
+        const posX = (b.minX + b.maxX) / 2;
+        const posZ = (b.minZ + b.maxZ) / 2;
+        const posY = b.minY;
+
+        try {
+          let resolvedType = item.type;
+          if (resolvedType === 'l_sofa') resolvedType = 'sofa_sectional_l';
+          else if (resolvedType === 'dining_table') resolvedType = 'dining_table_6s';
+          else if (resolvedType === 'bed_king' || resolvedType === 'master_bed') resolvedType = 'king_bed';
+          else if (resolvedType === 'bed_queen') resolvedType = 'queen_bed';
+          else if (resolvedType === 'wardrobe') resolvedType = 'wardrobe_3door';
+
+          const model = buildRealisticModel(resolvedType, { width, depth, height }, archStyle);
+          model.position.set(posX, posY, posZ);
+          model.castShadow = true;
+          model.receiveShadow = true;
+          furnitureGroup.add(model);
+        } catch {
+          const fMat = new THREE.MeshStandardMaterial({
+            color: item.color || '#9a6b3d',
+            roughness: 0.5,
+            metalness: 0.05
+          });
+          furnitureGroup.add(makeBoxMesh(item.bounds, fMat, true, true));
+        }
       });
     }
 

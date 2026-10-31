@@ -105,6 +105,12 @@ export function buildRealisticModel(furnitureType, dimensions, style = 'contempo
     metalness: 0.95
   });
 
+  const darkMetalMat = new THREE.MeshStandardMaterial({
+    color: '#18181b',
+    roughness: 0.35,
+    metalness: 0.8
+  });
+
   const ceramicMat = new THREE.MeshStandardMaterial({
     color: '#ffffff',
     roughness: 0.1,

@@ -141,6 +141,9 @@ export default function AiHouseDesignScreen({
     })()
   );
 
+  // Cumulative design history across session runs to guarantee unique non-repeating homes
+  const sessionDesignHistoryRef = useRef([]);
+
   // 2D CAD Interactive State
   const [activeCadFloor, setActiveCadFloor] = useState('ground');
   const [cadZoom, setCadZoom] = useState(1);
@@ -371,6 +374,9 @@ export default function AiHouseDesignScreen({
       },
       floors: canonicalDesign?.floors || legacyFallback.floors,
       geometry3d: canonicalDesign?.geometry3d,
+      furnishings: canonicalDesign?.furnishings,
+      interiorFurnishings: canonicalDesign?.furnishings,
+      landscape: canonicalDesign?.landscape,
       walkthroughTrajectory: canonicalDesign?.walkthroughTrajectory,
       boqEstimate: canonicalDesign?.boqEstimate,
       evaluation: canonicalDesign?.evaluation,
@@ -419,24 +425,34 @@ export default function AiHouseDesignScreen({
       };
 
       const runIndex = sessionGenerationRunCountRef.current;
+      // Cycle through diverse archetypes across consecutive runs
       const runOffset = isAdditional
-        ? (generatedVariations.length + (runIndex * 4))
-        : (runIndex * 2);
+        ? (generatedVariations.length + (runIndex * 3))
+        : (runIndex * 3 + Math.floor(Math.random() * 2));
 
-      const uniqueSeed = Date.now() + (runIndex * 31337) + Math.floor(Math.random() * 100000);
+      const uniqueSeed = Date.now() + (runIndex * 7919) + Math.floor(Math.random() * 1000000);
+
+      // Pass full cumulative history to guarantee no duplicate designs across runs
+      const historyToPass = [...sessionDesignHistoryRef.current, ...generatedVariations];
 
       // Call LabourConnectDesignEngine for authentic algorithmic layout generation
       const engineOutcome = designEngine.generateVariations(
         rawInputs,
         isAdditional ? 1 : 2,
-        isAdditional ? generatedVariations : [],
+        historyToPass,
         {
           baseVariationIndex: runOffset,
-          seed: uniqueSeed
+          seed: uniqueSeed,
+          enforceDiversity: true
         }
       );
 
       if (engineOutcome.success && engineOutcome.variations?.length > 0) {
+        engineOutcome.variations.forEach(v => {
+          if (!sessionDesignHistoryRef.current.some(h => h.id === v.id || h.code === v.code)) {
+            sessionDesignHistoryRef.current.push(v);
+          }
+        });
         if (isAdditional) {
           const newIdx = engineOutcome.variations[0].variationIndex !== undefined
             ? engineOutcome.variations[0].variationIndex

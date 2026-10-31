@@ -427,10 +427,10 @@ export default function AiHouseDesignScreen({
       const runIndex = sessionGenerationRunCountRef.current;
       // Cycle through diverse archetypes across consecutive runs
       const runOffset = isAdditional
-        ? (generatedVariations.length + (runIndex * 3))
-        : (runIndex * 3 + Math.floor(Math.random() * 2));
+        ? (generatedVariations.length + (runIndex * 4) + Math.floor(Math.random() * 50))
+        : (runIndex * 4 + Math.floor(Math.random() * 50));
 
-      const uniqueSeed = Date.now() + (runIndex * 7919) + Math.floor(Math.random() * 1000000);
+      const uniqueSeed = Date.now() + (runIndex * 100003) + Math.floor(Math.random() * 10000000);
 
       // Pass full cumulative history to guarantee no duplicate designs across runs
       const historyToPass = [...sessionDesignHistoryRef.current, ...generatedVariations];

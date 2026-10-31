@@ -401,6 +401,57 @@ export {
   resetPersistenceMemoryStore
 };
 
+
+/**
+ * Procedurally generates evocative, distinct architectural titles for designs.
+ */
+export function generateArchitecturalTitle(specs, layout, variationIndex = 0, seed = 0) {
+  const s = Math.abs(Number(seed) || 12345);
+  const style = (specs?.archStyle || 'modern').toLowerCase();
+  const bhk = specs?.bhkCount || 3;
+  const archetypeLabel = (layout?.archetype || 'villa').replace(/_/g, ' ').toUpperCase();
+
+  const STYLE_EPITHETS = {
+    vintage: [
+      'Heritage Nalukettu', 'Chettinad Verandah', 'Malabar Courtyard', 'Vedic Teak',
+      'Dakshin Classical', 'Konkan Haven', 'Mysore Royal', 'Thinnai Classical',
+      'Coromandel Atrium', 'Travancore Manor', 'Kashi Sanctum', 'Deccan Heritage'
+    ],
+    traditional_duplex: [
+      'Traditional Nalukettu', 'Angan Central', 'Vedic Harmony', 'Classical Mandapa',
+      'Dakshin Duplex', 'Poomukham Heritage', 'Deccan Court', 'Heritage Atrium'
+    ],
+    luxury_villa: [
+      'Imperial Statuario', 'Grand Colonnade', 'Cascading Azure', 'Palacio Veronese',
+      'Regency Pavilion', 'Prestige Haven', 'Celestial Atrium', 'Royal Elysium'
+    ],
+    penthouse: [
+      'Skyline Solarium', 'Summit Terrace', 'Panoramic Loft', 'Celestia Crown',
+      'Zenith Pergola', 'Cascade Penthouse', 'Aura Panorama', 'Starlight Terrace'
+    ],
+    tropical_modern: [
+      'Verdant Pavilion', 'Monsoon Louver', 'Breeze Atrium', 'Tropical Canopy',
+      'Lush Solarium', 'Biophilic Villa', 'Oasis Courtyard', 'Palm Court'
+    ],
+    minimalist: [
+      'Monochrome Linear', 'Zenith Form', 'Pure Cantilever', 'Atelier Minimal',
+      'Nordic Light', 'Solarium Cubic', 'Aura Geometry', 'Prism Courtyard'
+    ],
+    modern: [
+      'Horizon Glass', 'Linear Cantilever', 'Metropolitan Vista', 'Aerodynamic Cubic',
+      'Neo-Atrium', 'Panoramic Ribbon', 'Urban Edge', 'Solarium Villa'
+    ]
+  };
+
+  const prefixes = ['The', 'Villa', 'Resort', 'Mansion', 'Estate', 'Atelier', 'Pavilion'];
+  const epithets = STYLE_EPITHETS[style] || STYLE_EPITHETS.modern;
+  
+  const prefix = prefixes[(s + variationIndex) % prefixes.length];
+  const epithet = epithets[(Math.floor(s / 7) + variationIndex) % epithets.length];
+
+  return `${prefix} ${epithet} ${bhk}BHK (${archetypeLabel})`;
+}
+
 export class LabourConnectDesignEngine {
   constructor(options = {}) {
     this.version = SCHEMA_VERSION;
@@ -519,7 +570,7 @@ export class LabourConnectDesignEngine {
     const design = createEmptyDesign({
       id: `des-${seed}`,
       code: variantCode,
-      title: `${specs.archStyle.charAt(0).toUpperCase() + specs.archStyle.slice(1).replace('_', ' ')} ${specs.bhkCount}BHK (${layout.archetype.replace('_', ' ').toUpperCase()})`,
+      title: generateArchitecturalTitle(specs, layout, variationIndex, seed),
       seed
     });
 

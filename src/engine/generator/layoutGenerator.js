@@ -24,6 +24,23 @@ import { validateLayoutConstraints } from '../evaluation/constraintValidator.js'
 export const ENGINE_GENERATOR_VERSION = '2.1.0-s2-t06';
 
 /**
+ * Creates a deterministic Linear Congruential Pseudo-Random Number Generator.
+ * Guarantees exact reproducibility for any seed, while providing high entropy
+ * across different seeds and variation indices.
+ * 
+ * @param {number|string} seed - Input seed
+ * @returns {Function} Callable returning deterministic float in [0, 1)
+ */
+export function createPrng(seed) {
+  let s = Math.abs(Number(seed) || 123456789) % 2147483647;
+  if (s === 0) s = 123456789;
+  return function nextFloat() {
+    s = (s * 16807) % 2147483647;
+    return (s - 1) / 2147483646;
+  };
+}
+
+/**
  * Creates an honest failure candidate object when spatial constraints are impossible.
  */
 function createFailureCandidate(options = {}) {
@@ -79,6 +96,7 @@ export function generateLayout(specs, options = {}) {
   const variationIndex = options.variationIndex || 0;
   const seed = options.seed !== undefined ? options.seed : (Date.now() + variationIndex * 997);
   const candidateId = options.candidateId || `cand_${Math.abs(seed)}_${variationIndex}`;
+  const prng = createPrng(Number(seed) + Number(variationIndex) * 19997);
 
   // 1. Guard against null or invalid specifications
   if (!specs || typeof specs !== 'object') {
@@ -199,6 +217,12 @@ export function generateLayout(specs, options = {}) {
       b2Ratio = 0.42;
     }
   }
+
+  // Jitter band ratios smoothly based on seed so each run is geometrically unique
+  const b1Jitter = (prng() - 0.5) * 0.05;
+  const b2Jitter = (prng() - 0.5) * 0.05;
+  b1Ratio = Number(Math.max(0.24, Math.min(0.34, b1Ratio + b1Jitter)).toFixed(3));
+  b2Ratio = Number(Math.max(0.38, Math.min(0.48, b2Ratio + b2Jitter)).toFixed(3));
 
   // Determine realistic building envelope
   // On large plots (e.g. 0.3 acre = 13,068 sqft), do not expand the house to fill the entire plot like a warehouse.
@@ -369,7 +393,8 @@ export function generateLayoutCandidate(specs, options = {}) {
 /**
  * Solves 2D room packing, walls, and openings for a single floor.
  */
-function generateFloorLayout({ floorProg, env, stairwellBounds, archetype, variationIndex, specs, site: _site, b1Ratio: passedB1, b2Ratio: passedB2, options = {} }) {
+function generateFloorLayout({ floorProg, env, stairwellBounds, archetype, variationIndex, specs, site: _site, b1Ratio: passedB1, b2Ratio: passedB2, options = {}, prng = null }) {
+  const rng = prng || createPrng((options.seed || 12345) + variationIndex * 19997);
   const rooms = [];
   const W = env.width;
   const L = env.length;

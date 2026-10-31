@@ -618,6 +618,8 @@ export class LabourConnectDesignEngine {
     });
 
     design.variationIndex = variationIndex;
+    design.archetype = layout.generationMetadata?.archetype || layout.archetype || selectedArchetype;
+    design.generationMetadata = layout.generationMetadata;
     design.inputs = specs;
     design.site = layout.site;
     design.metrics = layout.metrics;
@@ -687,12 +689,14 @@ export class LabourConnectDesignEngine {
       SPATIAL_ARCHETYPES.OPEN_CONTEMPORARY,
       SPATIAL_ARCHETYPES.COURTYARD_CENTRIC,
       SPATIAL_ARCHETYPES.VILLA_PAVILION,
+      SPATIAL_ARCHETYPES.L_SHAPE_COURT,
+      SPATIAL_ARCHETYPES.SPLIT_WING_ZONED,
       SPATIAL_ARCHETYPES.LINEAR_SPINE
     ];
 
     for (let i = 0; i < count; i++) {
       const varIdx = startIndex + i;
-      const archetype = archetypes[varIdx % archetypes.length];
+      const archetype = options.archetype || archetypes[varIdx % archetypes.length];
       const runSeed = (options && options.seed !== undefined)
         ? (options.seed + (varIdx * 19997) + (i * 3779))
         : (Date.now() + (varIdx * 19997) + (i * 3779) + Math.floor(Math.random() * 10000));

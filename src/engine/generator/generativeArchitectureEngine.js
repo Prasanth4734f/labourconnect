@@ -130,13 +130,16 @@ export class GenerativeArchitectureEngine {
       const b1Ratio = 0.22 + ((candidateIndex * 3) % 7) * 0.016;
       const b2Ratio = 0.38 + ((candidateIndex * 5) % 7) * 0.016;
 
-      const allArchetypes = [
-        SPATIAL_ARCHETYPES.OPEN_CONTEMPORARY,
-        SPATIAL_ARCHETYPES.COURTYARD_CENTRIC,
-        SPATIAL_ARCHETYPES.LINEAR_SPINE,
-        SPATIAL_ARCHETYPES.VILLA_PAVILION
-      ];
-      const selectedArchetype = options.archetype || allArchetypes[Math.floor(candidateIndex / 32) % allArchetypes.length];
+      const isNarrowPlot = Number(specs.plotWidth || 30) < 35;
+      const allArchetypes = isNarrowPlot
+        ? [SPATIAL_ARCHETYPES.OPEN_CONTEMPORARY, SPATIAL_ARCHETYPES.LINEAR_SPINE]
+        : [
+            SPATIAL_ARCHETYPES.OPEN_CONTEMPORARY,
+            SPATIAL_ARCHETYPES.COURTYARD_CENTRIC,
+            SPATIAL_ARCHETYPES.LINEAR_SPINE,
+            SPATIAL_ARCHETYPES.VILLA_PAVILION
+          ];
+      const selectedArchetype = options.archetype || allArchetypes[Math.floor(candidateIndex / 16) % allArchetypes.length];
 
       const layoutOptions = {
         variationIndex: candidateIndex,

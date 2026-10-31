@@ -22,7 +22,9 @@ export const SPATIAL_ARCHETYPES = {
   OPEN_CONTEMPORARY: 'open_contemporary',
   COURTYARD_CENTRIC: 'courtyard_centric',
   LINEAR_SPINE: 'linear_spine',
-  VILLA_PAVILION: 'villa_pavilion'
+  VILLA_PAVILION: 'villa_pavilion',
+  L_SHAPE_COURT: 'l_shape_court',
+  SPLIT_WING_ZONED: 'split_wing_zoned'
 };
 
 /**
@@ -81,14 +83,25 @@ export function selectSpatialArchetype(specs = {}, variationIndex = 0) {
     return SPATIAL_ARCHETYPES.LINEAR_SPINE;
   }
 
-  // Rotate across diverse archetypes
-  const archetypes = [
+  // Large or wide plots (plotWidth >= 35) can accommodate grand courtyard or pavilion massings
+  if (plotWidth >= 35) {
+    const wideArchetypes = [
+      SPATIAL_ARCHETYPES.COURTYARD_CENTRIC,
+      SPATIAL_ARCHETYPES.VILLA_PAVILION,
+      SPATIAL_ARCHETYPES.L_SHAPE_COURT,
+      SPATIAL_ARCHETYPES.SPLIT_WING_ZONED,
+      SPATIAL_ARCHETYPES.OPEN_CONTEMPORARY
+    ];
+    return wideArchetypes[variationIndex % wideArchetypes.length];
+  }
+
+  // Compact plots (plotWidth < 35) alternate across archetypes suited for compact plinths
+  const compactArchetypes = [
     SPATIAL_ARCHETYPES.OPEN_CONTEMPORARY,
-    SPATIAL_ARCHETYPES.VILLA_PAVILION,
-    SPATIAL_ARCHETYPES.COURTYARD_CENTRIC
+    SPATIAL_ARCHETYPES.LINEAR_SPINE
   ];
 
-  return archetypes[variationIndex % archetypes.length];
+  return compactArchetypes[variationIndex % compactArchetypes.length];
 }
 
 /**

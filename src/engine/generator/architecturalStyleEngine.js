@@ -421,3 +421,4 @@ export function resolveStyleAndTypology(promptOrSpecs) {
     summary: `${resolvedStyle.name} (${resolvedTypology.name})`
   };
 }
+

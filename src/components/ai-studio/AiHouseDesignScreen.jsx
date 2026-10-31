@@ -361,6 +361,30 @@ export default function AiHouseDesignScreen({
       ? `Variation #${varIndex + 1}: ${canonicalDesign.title}`
       : (canonicalDesign?.title || legacyFallback.title);
 
+    // Dynamically derive roomSchedule directly from canonicalDesign floors
+    let dynamicRoomSchedule = legacyFallback.roomSchedule;
+    if (canonicalDesign?.floors && Array.isArray(canonicalDesign.floors)) {
+      const scheduleRooms = [];
+      canonicalDesign.floors.forEach((fl) => {
+        const floorName = fl.name || (fl.floorIndex === 0 ? 'Ground Floor' : fl.floorIndex === 1 ? 'First Floor' : 'Terrace Level');
+        (fl.rooms || []).forEach(rm => {
+          if (!rm.bounds) return;
+          scheduleRooms.push({
+            id: rm.id,
+            name: rm.name,
+            floor: floorName,
+            dim: rm.dimensionsLabel || `${rm.bounds.width.toFixed(1)}' × ${rm.bounds.length.toFixed(1)}'`,
+            area: `${rm.areaSqft || Math.round(rm.bounds.width * rm.bounds.length)} sq.ft`,
+            zone: rm.orientation || rm.zone || 'Central',
+            finish: rm.finish || 'Vitrified Tiles'
+          });
+        });
+      });
+      if (scheduleRooms.length > 0) {
+        dynamicRoomSchedule = scheduleRooms;
+      }
+    }
+
     return {
       ...legacyFallback,
       ...canonicalDesign,
@@ -382,7 +406,7 @@ export default function AiHouseDesignScreen({
       evaluation: canonicalDesign?.evaluation,
       isoModel: legacyFallback.isoModel,
       elevationModel: legacyFallback.elevationModel,
-      roomSchedule: legacyFallback.roomSchedule,
+      roomSchedule: dynamicRoomSchedule,
       boqBreakdown: legacyFallback.boqBreakdown,
       vaastuReport: legacyFallback.vaastuReport,
       structuralGrid: canonicalDesign?.structuralGrid || legacyFallback.structuralGrid

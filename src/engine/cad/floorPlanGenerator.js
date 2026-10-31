@@ -631,7 +631,7 @@ export function deriveDimensionChains(site, envelope, rooms = []) {
   const setbacks = site?.setbacks || { front: 5, rear: 4, left: 3, right: 3 };
 
   // 1. Tier 1: Overall Plot Boundary Dimension Chains
-  const plotSegments = [
+  const plotDimensions = [
     {
       id: 'dim_plot_w',
       label: `${plotW.toFixed(1)}′ 0″`,
@@ -653,16 +653,8 @@ export function deriveDimensionChains(site, envelope, rooms = []) {
       witnessEnd: { x: 0, y: plotL }
     }
   ];
-  const plotDimensions = Object.create(Array.prototype);
-  plotDimensions[0] = plotSegments[0];
-  plotDimensions[1] = plotSegments[1];
-  plotDimensions.segments = plotSegments;
   plotDimensions.width = plotW;
   plotDimensions.length = plotL;
-  plotDimensions[Symbol.iterator] = function* () {
-    yield plotSegments[0];
-    yield plotSegments[1];
-  };
 
   // 2. Tier 2: Municipal Setback Clearances
   const setbackDimensions = [
@@ -815,52 +807,24 @@ export function layoutCadRoomLabel(room, scale = 9.5, columns = [], pxFn = null,
     .replace(/^SECONDARY\s+/i, '')
     .replace(/^MASTER\s+PENTHOUSE\s+/i, 'MASTER ');
 
-  // Canonical architectural simplifications for CAD drawings
-  const CAD_SIMPLIFICATIONS = [
-    [/^(ENTRANCE\s+)?FOYER\s+&\s+VERANDAH$/i, 'FOYER & VERANDAH'],
-    [/^(COVERED\s+)?CAR\s+PORCH\s+&\s+PORTICO$/i, 'CAR PORCH & PORTICO'],
-    [/^STAIRWELL.*$/i, 'STAIRWELL'],
-    [/^STAIRCASE.*$/i, 'STAIRCASE'],
-    [/^LIVING\s+LOUNGE$/i, 'LIVING LOUNGE'],
-    [/^DINING\s+AREA$/i, 'DINING AREA'],
-    [/^POOJA\s+SANCTUM$/i, 'POOJA SANCTUM'],
-    [/^SANITARY\s+BATH\s+&\s+(TOILET|POWDER)$/i, 'BATH & TOILET'],
-    [/^EN-SUITE\s+BATH$/i, 'ATTACHED BATH'],
-    [/^GOURMET\s+KITCHEN$/i, 'GOURMET KITCHEN'],
-    [/^BEDROOM\s+SUITE$/i, 'BEDROOM SUITE']
-  ];
-
-  for (const [pattern, repl] of CAD_SIMPLIFICATIONS) {
-    if (pattern.test(rawName)) {
-      rawName = repl;
-      break;
-    }
+  // Standard CAD Clean-up: Prevent horizontal text collisions across partition walls
+  if (rawName.includes('POOJA')) rawName = 'POOJA';
+  else if (rawName.includes('STAIR')) rawName = 'STAIRS';
+  else if (rawName.includes('KITCHEN')) rawName = 'KITCHEN';
+  else if (rawName.includes('DINING')) rawName = 'DINING';
+  else if (rawName.includes('LIVING')) rawName = maxAvailW < 110 ? 'LIVING' : 'LIVING LOUNGE';
+  else if (rawName.includes('BATH') || rawName.includes('TOILET')) rawName = maxAvailW < 90 ? 'BATH' : 'BATH & TOILET';
+  else if (rawName.includes('CAR PORCH') || rawName.includes('PORTICO')) rawName = maxAvailW < 110 ? 'CAR PORCH' : 'PORCH & PORTICO';
+  else if (rawName.includes('FOYER') || rawName.includes('VERANDAH')) rawName = maxAvailW < 110 ? 'FOYER' : 'FOYER & VERANDAH';
+  else if (rawName.includes('MASTER')) rawName = 'MASTER BED';
+  else if (rawName.includes('BEDROOM') || rawName.includes('BED')) {
+    if (rawName.includes('2') || rawName.includes('GUEST') || rawName.includes('CHILD')) rawName = maxAvailW < 90 ? 'BED 2' : 'GUEST BED';
+    else if (rawName.includes('3')) rawName = maxAvailW < 90 ? 'BED 3' : 'BEDROOM 3';
+    else rawName = 'BEDROOM';
   }
-
-  // Compact mode for tight spaces (< 100px wide) to prevent label spillover into adjacent rooms
-  if (maxAvailW < 100) {
-    rawName = rawName
-      .replace(/ & VERANDAH/g, '')
-      .replace(/ & PORTICO/g, '')
-      .replace(/ SANCTUM/g, '')
-      .replace(/ & TOILET/g, '')
-      .replace(/ & POWDER/g, '')
-      .replace(/ LOUNGE/g, '')
-      .replace(/ AREA/g, '')
-      .replace(/GOURMET /g, '')
-      .replace(/ATTACHED /g, '')
-      .replace(/ SUITE/g, '')
-      .replace(/STAIRWELL/g, 'STAIRS');
-  }
-  if (maxAvailW < 75) {
-    rawName = rawName
-      .replace(/^GROUND\s+BEDROOM$/i, 'BEDROOM')
-      .replace(/^BEDROOM\s+SUITE$/i, 'BEDROOM')
-      .replace(/^CHILDREN\s+.*2$/i, 'BED 2')
-      .replace(/^GUEST\s+.*3$/i, 'BED 3')
-      .replace(/^BATH\s+.*$/i, 'BATH')
-      .replace(/^CAR\s+PORCH$/i, 'PORCH');
-  }
+  else if (rawName.includes('COURTYARD') || rawName.includes('MUTTAM')) rawName = 'COURTYARD';
+  else if (rawName.includes('BALCONY')) rawName = 'BALCONY';
+  else if (rawName.includes('TERRACE')) rawName = 'TERRACE';
 
   // Name font size and line wrapping
   let targetFontSize = maxAvailW > 120 ? 9.2 : maxAvailW > 75 ? 8.2 : 7.0;

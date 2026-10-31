@@ -225,11 +225,15 @@ export function exploreDesignSpaceCoordinate(specs, seed, candidateIndex = 0, op
 
   // 8. Map to legacy SPATIAL_ARCHETYPES for full backward-compatibility with existing validator & viewers
   let legacyArchetype = SPATIAL_ARCHETYPES.OPEN_CONTEMPORARY;
-  if (hasCourtyard) {
+  if (hasCourtyard || massingFamily === MASSING_FAMILIES.COURTYARD_NAALUKETTU || massingFamily === MASSING_FAMILIES.U_SHAPE_CENTRAL) {
     legacyArchetype = SPATIAL_ARCHETYPES.COURTYARD_CENTRIC;
+  } else if (massingFamily === MASSING_FAMILIES.L_SHAPE_COURT) {
+    legacyArchetype = SPATIAL_ARCHETYPES.L_SHAPE_COURT;
+  } else if (massingFamily === MASSING_FAMILIES.SPLIT_WING_ZONED || massingFamily === MASSING_FAMILIES.STAGGERED_OFFSET) {
+    legacyArchetype = SPATIAL_ARCHETYPES.SPLIT_WING_ZONED;
   } else if (massingFamily === MASSING_FAMILIES.LINEAR_PAVILION || spatialTopology === SPATIAL_TOPOLOGIES.LINEAR_SPINE_GALLERY) {
     legacyArchetype = SPATIAL_ARCHETYPES.LINEAR_SPINE;
-  } else if (massingFamily === MASSING_FAMILIES.U_SHAPE_CENTRAL || massingFamily === MASSING_FAMILIES.SPLIT_WING_ZONED || bhkCount >= 4) {
+  } else if (bhkCount >= 4 || massingFamily === MASSING_FAMILIES.VILLA_PAVILION) {
     legacyArchetype = SPATIAL_ARCHETYPES.VILLA_PAVILION;
   }
 
@@ -278,3 +282,4 @@ export function generateDesignSpacePool(specs, count = 100, baseSeed = Date.now(
     pool
   };
 }
+

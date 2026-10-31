@@ -20,6 +20,17 @@ import { solvePlotBoundary } from './plotBoundarySolver.js';
 import { generateRoomProgram } from './roomProgrammer.js';
 import { ROOM_TYPES, ZONES } from '../schema/canonicalDesignSchema.js';
 import { validateLayoutConstraints } from '../evaluation/constraintValidator.js';
+import {
+  solveCourtyardGroundLayout,
+  solveCourtyardUpperLayout,
+  solveLShapeGroundLayout,
+  solveLShapeUpperLayout,
+  solveSplitWingGroundLayout,
+  solveSplitWingUpperLayout,
+  solvePavilionGroundLayout,
+  solvePavilionUpperLayout,
+  getArchetypeStairwellBounds
+} from './archetypeLayoutSolvers.js';
 
 export const ENGINE_GENERATOR_VERSION = '2.1.0-s2-t06';
 
@@ -247,7 +258,11 @@ export function generateLayout(specs, options = {}) {
   }
 
   if (isMultiFloor) {
-    const stairWidth = Number(Math.min(8.5, Math.max(6.5, bldEnv.width * 0.22)).toFixed(2));
+    const archetypeStair = getArchetypeStairwellBounds(archetype, bldEnv, options);
+    if (archetypeStair) {
+      stairwellBounds = archetypeStair;
+    } else {
+      const stairWidth = Number(Math.min(8.5, Math.max(6.5, bldEnv.width * 0.22)).toFixed(2));
     const isCompactDepth = bldEnv.length <= 26.0;
     const band1L = isCompactDepth ? 4.0 : Number((bldEnv.length * b1Ratio).toFixed(2));
     const band2L = isCompactDepth ? 11.6 : Number((bldEnv.length * b2Ratio).toFixed(2));
@@ -269,6 +284,7 @@ export function generateLayout(specs, options = {}) {
       width: stairWidth,
       length: stairLength
     };
+    }
   }
 
   // 8. Solve Topological Relationship Graph (S2-T03 Integration)
@@ -406,7 +422,36 @@ function generateFloorLayout({ floorProg, env, stairwellBounds, archetype, varia
     (floorProg.name && floorProg.name.toLowerCase().includes('terrace')) ||
     (specs.floorsCount <= 2 && floorProg.floorIndex >= 2);
 
-  if (isTerrace) {
+  let floorFootprints = [{ ...env }];
+
+  let solvedArchetype = null;
+  const isMultiFloor = (specs.floorsCount || 1) > 1;
+  if (!isTerrace && floorProg.floorIndex === 0 && isMultiFloor) {
+    if (archetype === SPATIAL_ARCHETYPES.COURTYARD_CENTRIC) {
+      solvedArchetype = solveCourtyardGroundLayout({ env, specs, floorProg, stairwellBounds, options, rng });
+    } else if (archetype === SPATIAL_ARCHETYPES.L_SHAPE_COURT) {
+      solvedArchetype = solveLShapeGroundLayout({ env, specs, floorProg, stairwellBounds, options, rng });
+    } else if (archetype === SPATIAL_ARCHETYPES.SPLIT_WING_ZONED) {
+      solvedArchetype = solveSplitWingGroundLayout({ env, specs, floorProg, stairwellBounds, options, rng });
+    } else if (archetype === SPATIAL_ARCHETYPES.VILLA_PAVILION) {
+      solvedArchetype = solvePavilionGroundLayout({ env, specs, floorProg, stairwellBounds, options, rng });
+    }
+  } else if (!isTerrace && floorProg.floorIndex === 1 && isMultiFloor) {
+    if (archetype === SPATIAL_ARCHETYPES.COURTYARD_CENTRIC) {
+      solvedArchetype = solveCourtyardUpperLayout({ env, specs, floorProg, stairwellBounds, options, rng });
+    } else if (archetype === SPATIAL_ARCHETYPES.L_SHAPE_COURT) {
+      solvedArchetype = solveLShapeUpperLayout({ env, specs, floorProg, stairwellBounds, options, rng });
+    } else if (archetype === SPATIAL_ARCHETYPES.SPLIT_WING_ZONED) {
+      solvedArchetype = solveSplitWingUpperLayout({ env, specs, floorProg, stairwellBounds, options, rng });
+    } else if (archetype === SPATIAL_ARCHETYPES.VILLA_PAVILION) {
+      solvedArchetype = solvePavilionUpperLayout({ env, specs, floorProg, stairwellBounds, options, rng });
+    }
+  }
+
+  if (solvedArchetype && Array.isArray(solvedArchetype.rooms) && solvedArchetype.rooms.length > 0) {
+    rooms.push(...solvedArchetype.rooms);
+    floorFootprints = solvedArchetype.footprints || [{ ...env }];
+  } else if (isTerrace) {
     // -----------------------------------------------------------------------
     // TERRACE FLOOR PROCEDURAL PACKING
     // Mumty over aligned stairwell + Rooftop Open Deck / Pergola
@@ -1467,6 +1512,7 @@ function generateFloorLayout({ floorProg, env, stairwellBounds, archetype, varia
     elevationZ: floorProg.elevationZ,
     floorHeight: floorProg.floorHeight,
     bounds: { ...env },
+    footprints: floorFootprints,
     rooms,
     walls,
     adjacencyGraph

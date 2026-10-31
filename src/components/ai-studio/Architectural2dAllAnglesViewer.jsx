@@ -761,6 +761,8 @@ export default function Architectural2dAllAnglesViewer({
                                 fontSize={line.fontSize}
                                 fontWeight={line.fontWeight}
                                 fill={line.color}
+                                textLength={line.textLength || undefined}
+                                lengthAdjust={line.textLength ? 'spacingAndGlyphs' : undefined}
                               >
                                 {line.text}
                               </text>

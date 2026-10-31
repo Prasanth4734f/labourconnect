@@ -753,6 +753,213 @@ export function deriveDimensionChains(site, envelope, rooms = []) {
 }
 
 // =============================================================================
+// PHASE 8 — ANTI-COLLISION ARCHITECTURAL ROOM LABEL AUTO-FITTING
+// =============================================================================
+
+/**
+ * Computes an anti-collision architectural room label badge.
+ * Auto-fits room titles, dimensions, and area within available room boundary bounds,
+ * eliminating adjacent room collisions and preventing overlap with columns.
+ *
+ * @param {Object} room - Room element with bounds and name
+ * @param {number} scale - Pixels per foot
+ * @param {Array} columns - Optional array of structural columns
+ * @param {Function} pxFn - Foot to px X-coordinate function
+ * @param {Function} pyFn - Foot to px Y-coordinate function
+ * @param {number} marginPx - Canvas margin in pixels
+ * @returns {Object} Calculated badge geometry and rendered text lines
+ */
+export function layoutCadRoomLabel(room, scale = 9.5, columns = [], pxFn = null, pyFn = null, marginPx = 40) {
+  const b = room.bounds || { x: 0, y: 0, width: 10, length: 10 };
+  const rwPx = (b.width || 10) * scale;
+  const rhPx = (b.length || 10) * scale;
+
+  const maxAvailW = Math.max(26, rwPx - 8);
+  const maxAvailH = Math.max(20, rhPx - 6);
+
+  const px = pxFn || ((val) => Math.round(marginPx + Number(val) * scale));
+  const py = pyFn || ((val) => Math.round(marginPx + Number(val) * scale));
+
+  const origCx = px(room.center ? room.center.x : b.x + b.width / 2);
+  const origCy = py(room.center ? room.center.y : b.y + b.length / 2);
+
+  let rawName = (room.name || 'ROOM').toUpperCase().trim();
+
+  // Canonical architectural simplifications for CAD drawings
+  const CAD_SIMPLIFICATIONS = [
+    [/^GRAND ENTRANCE FOYER & VERANDAH$/i, 'FOYER & VERANDAH'],
+    [/^COVERED CAR PORCH & PORTICO$/i, 'CAR PORCH & PORTICO'],
+    [/^RCC DOG-LEGGED STAIRWELL.*$/i, 'STAIRWELL'],
+    [/^RCC DOG-LEGGED STAIRCASE.*$/i, 'STAIRCASE'],
+    [/^FORMAL LIVING LOUNGE$/i, 'LIVING LOUNGE'],
+    [/^CENTRAL DINING AREA$/i, 'DINING AREA'],
+    [/^ISHANYA POOJA SANCTUM$/i, 'POOJA SANCTUM'],
+    [/^SANITARY BATH & (TOILET|POWDER)$/i, 'BATH & TOILET'],
+    [/^GROUND SUITE EN-SUITE BATH$/i, 'ATTACHED BATH'],
+    [/^MODULAR GOURMET KITCHEN$/i, 'GOURMET KITCHEN'],
+    [/^GROUND BEDROOM SUITE$/i, 'BEDROOM SUITE']
+  ];
+
+  for (const [pattern, repl] of CAD_SIMPLIFICATIONS) {
+    if (pattern.test(rawName)) {
+      rawName = repl;
+      break;
+    }
+  }
+
+  // Ultra-compact mode for tight spaces (< 75px wide)
+  if (maxAvailW < 75) {
+    rawName = rawName
+      .replace(/ & VERANDAH/g, '')
+      .replace(/ & PORTICO/g, '')
+      .replace(/ SANCTUM/g, '')
+      .replace(/ & TOILET/g, '')
+      .replace(/ & POWDER/g, '')
+      .replace(/ LOUNGE/g, '')
+      .replace(/ AREA/g, '')
+      .replace(/GOURMET /g, '')
+      .replace(/ATTACHED /g, '')
+      .replace(/ SUITE/g, '')
+      .replace(/RCC /g, '');
+  }
+
+  // Name font size and line wrapping
+  let targetFontSize = maxAvailW > 120 ? 9.2 : maxAvailW > 75 ? 8.2 : 7.0;
+  let nameLines = [rawName];
+
+  if (rawName.length * targetFontSize * 0.58 > maxAvailW && rawName.includes(' ')) {
+    if (rawName.includes(' & ')) {
+      const parts = rawName.split(' & ');
+      nameLines = [parts[0], '& ' + parts[1]];
+    } else {
+      const words = rawName.split(' ');
+      if (words.length === 2) {
+        nameLines = words;
+      } else if (words.length > 2) {
+        const mid = Math.ceil(words.length / 2);
+        nameLines = [words.slice(0, mid).join(' '), words.slice(mid).join(' ')];
+      }
+    }
+  }
+
+  const longestNameLen = Math.max(...nameLines.map(l => l.length));
+  let nameFontSize = targetFontSize;
+  if (longestNameLen * nameFontSize * 0.58 > maxAvailW) {
+    nameFontSize = Math.max(5.5, Number((maxAvailW / (longestNameLen * 0.58)).toFixed(1)));
+  }
+
+  // Dimension lines
+  const dimStr = room.nominalDimLabel || `${b.width.toFixed(1)}′ × ${b.length.toFixed(1)}′`;
+  const sqftStr = room.areaSqft ? `(${room.areaSqft} sq.ft)` : '';
+  const fullDim = dimStr && sqftStr ? `${dimStr} ${sqftStr}` : dimStr || sqftStr;
+
+  let dimFontSize = Math.min(7.5, Math.max(5.4, Number((nameFontSize - 0.7).toFixed(1))));
+  let dimLines = [];
+
+  if (fullDim.length * dimFontSize * 0.55 <= maxAvailW) {
+    dimLines = [fullDim];
+  } else if (dimStr && sqftStr && maxAvailH >= 34) {
+    let dSize = dimFontSize;
+    const maxDLen = Math.max(dimStr.length, sqftStr.length);
+    if (maxDLen * dSize * 0.55 > maxAvailW) {
+      dSize = Math.max(5.2, Number((maxAvailW / (maxDLen * 0.55)).toFixed(1)));
+    }
+    dimFontSize = dSize;
+    dimLines = [dimStr, sqftStr];
+  } else {
+    dimLines = [sqftStr || dimStr];
+  }
+
+  const maxNameWidth = Math.max(...nameLines.map(l => l.length * nameFontSize * 0.58));
+  const maxDimWidth = Math.max(...dimLines.map(l => l.length * dimFontSize * 0.55));
+  const contentWidth = Math.max(maxNameWidth, maxDimWidth);
+
+  const pillWidth = Math.min(maxAvailW, Math.max(28, Math.round(contentWidth + 10)));
+  const totalLines = nameLines.length + dimLines.length;
+  const lineHeight = maxAvailH < 35 ? 9.5 : 11;
+  const pillHeight = Math.min(maxAvailH, Math.round(totalLines * lineHeight + 6));
+
+  // Column avoidance: if a structural column is near origCx, origCy, shift badge
+  let cx = origCx;
+  let cy = origCy;
+  if (Array.isArray(columns) && columns.length > 0) {
+    for (const col of columns) {
+      const colX = px(col.x);
+      const colY = py(col.y);
+      if (Math.hypot(colX - origCx, colY - origCy) < 22) {
+        if (colY >= origCy) {
+          cy -= 12;
+        } else {
+          cy += 12;
+        }
+        break;
+      }
+    }
+  }
+
+  // Clamp within room plinth bounds
+  const minX = px(b.x) + pillWidth / 2 + 2;
+  const maxX = px(b.x + b.width) - pillWidth / 2 - 2;
+  const minY = py(b.y) + pillHeight / 2 + 2;
+  const maxY = py(b.y + b.length) - pillHeight / 2 - 2;
+
+  if (maxX >= minX) {
+    cx = Math.max(minX, Math.min(maxX, cx));
+  }
+  if (maxY >= minY) {
+    cy = Math.max(minY, Math.min(maxY, cy));
+  }
+
+  const badgeX = Math.round(cx - pillWidth / 2);
+  const badgeY = Math.round(cy - pillHeight / 2);
+
+  // Generate exact rendered lines with centers
+  const renderedLines = [];
+  const startY = badgeY + (pillHeight / 2) - ((totalLines - 1) * lineHeight / 2);
+
+  let currentLineIdx = 0;
+  for (const nl of nameLines) {
+    renderedLines.push({
+      text: nl,
+      x: cx,
+      y: Number((startY + currentLineIdx * lineHeight).toFixed(1)),
+      fontSize: nameFontSize,
+      fontWeight: '800',
+      color: CAD_COLORS.ROOM_LABEL,
+      type: 'name'
+    });
+    currentLineIdx++;
+  }
+
+  for (const dl of dimLines) {
+    renderedLines.push({
+      text: dl,
+      x: cx,
+      y: Number((startY + currentLineIdx * lineHeight).toFixed(1)),
+      fontSize: dimFontSize,
+      fontWeight: '700',
+      color: CAD_COLORS.ROOM_DIM_TEXT,
+      type: 'dim'
+    });
+    currentLineIdx++;
+  }
+
+  return {
+    badgeX,
+    badgeY,
+    pillWidth,
+    pillHeight,
+    cx,
+    cy,
+    nameLines,
+    dimLines,
+    nameFontSize,
+    dimFontSize,
+    renderedLines
+  };
+}
+
+// =============================================================================
 // PHASE 8 & 9 — COMPLETE 2D FLOOR-PLAN DRAWING GENERATION
 // =============================================================================
 
@@ -844,6 +1051,13 @@ export function generate2dFloorPlan(design, options = {}) {
 
   const canvasWidth = Math.round(plotW * scale + marginPx * 2);
   const canvasHeight = Math.round(plotL * scale + marginPx * 2);
+
+  const planPx = (x) => Math.round(marginPx + Number(x) * scale);
+  const planPy = (y) => Math.round(marginPx + Number(y) * scale);
+
+  roomElements.forEach(r => {
+    r.labelLayout = layoutCadRoomLabel(r, scale, columns, planPx, planPy, marginPx);
+  });
 
   return {
     success: true,
@@ -1097,20 +1311,28 @@ export function generateFloorPlanSvg(design, options = {}) {
       const cl = pLen(col.length);
 
       svgParts.push(`    <rect x="${cx}" y="${cy}" width="${cw}" height="${cl}" fill="url(#rccHatch)" stroke="${CAD_COLORS.COLUMN}" stroke-width="${CAD_LINE_WEIGHTS.COLUMN_OUTLINE}" />\n`);
-      svgParts.push(`    <text x="${cx + cw / 2}" y="${cy - 3}" font-size="7" font-weight="800" text-anchor="middle" fill="${CAD_COLORS.COLUMN}">${col.id}</text>\n`);
+      svgParts.push(`    <text x="${cx + cw / 2}" y="${cy - 3}" font-size="6.5" font-weight="800" text-anchor="middle" fill="${CAD_COLORS.COLUMN}" stroke="#FFFFFF" stroke-width="2.5" paint-order="stroke fill">${col.id}</text>\n`);
     });
     svgParts.push(`  </g>\n`);
   }
 
-  // 9. Layer: Room Labels and Clear Dimensions
+  // 9. Layer: Room Labels and Clear Dimensions (Anti-Collision Architectural Badges)
   if (showRoomLabels) {
-    svgParts.push(`  <!-- LAYER 8: ROOM LABELS & AREAS -->\n  <g id="layer-room-labels">\n`);
+    svgParts.push(`  <!-- LAYER 8: ROOM LABELS & AREAS (ANTI-COLLISION ARCHITECTURAL BADGES) -->\n  <g id="layer-room-labels">\n`);
     roomElements.forEach(r => {
-      const cx = px(r.center.x);
-      const cy = py(r.center.y);
+      const layout = r.labelLayout || layoutCadRoomLabel(r, S, columns, px, py, M);
+      const bx = layout.badgeX;
+      const by = layout.badgeY;
+      const bw = layout.pillWidth;
+      const bh = layout.pillHeight;
 
-      svgParts.push(`    <text x="${cx}" y="${cy - 5}" text-anchor="middle" font-size="10" font-weight="800" fill="${CAD_COLORS.ROOM_LABEL}">${r.name.toUpperCase()}</text>\n`);
-      svgParts.push(`    <text x="${cx}" y="${cy + 8}" text-anchor="middle" font-size="8.5" font-weight="700" fill="${CAD_COLORS.ROOM_DIM_TEXT}">${r.nominalDimLabel} (${r.areaSqft} sq.ft)</text>\n`);
+      svgParts.push(`    <g id="lbl-${r.id}" class="cad-room-badge">\n`);
+      svgParts.push(`      <rect x="${bx}" y="${by}" width="${bw}" height="${bh}" rx="4" fill="rgba(255, 255, 255, 0.94)" stroke="#CBD5E1" stroke-width="0.8" />\n`);
+
+      layout.renderedLines.forEach(line => {
+        svgParts.push(`      <text x="${line.x}" y="${line.y}" text-anchor="middle" dominant-baseline="central" font-size="${line.fontSize}" font-weight="${line.fontWeight}" fill="${line.color}">${line.text}</text>\n`);
+      });
+      svgParts.push(`    </g>\n`);
     });
     svgParts.push(`  </g>\n`);
   }

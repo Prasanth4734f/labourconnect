@@ -1332,44 +1332,52 @@ export default function Realistic2dDesignStudio({
                   )}
 
                   {/* Room Name Badge & Clear Dimensions */}
-                  {layers.roomLabels && (
-                    <g pointerEvents="none">
-                      <rect
-                        x={room.x + room.w / 2 - 58}
-                        y={room.y + (room.h > 120 ? room.h / 2 - 18 : room.h / 2 - 12)}
-                        width="116"
-                        height="26"
-                        fill="rgba(15, 23, 42, 0.85)"
-                        stroke={isSelected ? '#f59e0b' : 'rgba(56, 189, 248, 0.4)'}
-                        strokeWidth="1"
-                        rx="5"
-                      />
-                      <text
-                        x={room.x + room.w / 2}
-                        y={room.y + (room.h > 120 ? room.h / 2 - 4 : room.h / 2 + 2)}
-                        fill="#f8fafc"
-                        fontSize="10"
-                        fontFamily="Outfit, sans-serif"
-                        fontWeight="700"
-                        textAnchor="middle"
-                      >
-                        {room.name.length > 20 ? room.name.substring(0, 18) + '...' : room.name}
-                      </text>
-                      {layers.dimensions && (
+                  {layers.roomLabels && (() => {
+                    const bw = Math.min(room.w - 10, 116);
+                    const bh = 26;
+                    const bx = room.x + room.w / 2 - bw / 2;
+                    const by = room.y + (room.h > 120 ? room.h / 2 - 18 : room.h / 2 - 12);
+                    const maxChars = Math.max(6, Math.floor(bw / 6.2));
+                    const fSize = bw < 75 ? 8 : 10;
+                    return (
+                      <g pointerEvents="none">
+                        <rect
+                          x={bx}
+                          y={by}
+                          width={bw}
+                          height={bh}
+                          fill="rgba(15, 23, 42, 0.88)"
+                          stroke={isSelected ? '#f59e0b' : 'rgba(56, 189, 248, 0.4)'}
+                          strokeWidth="1"
+                          rx="5"
+                        />
                         <text
                           x={room.x + room.w / 2}
-                          y={room.y + (room.h > 120 ? room.h / 2 + 6 : room.h / 2 + 10)}
-                          fill="#fbbf24"
-                          fontSize="8.5"
-                          fontFamily="monospace"
-                          fontWeight="bold"
+                          y={by + (layers.dimensions ? 11 : 16)}
+                          fill="#f8fafc"
+                          fontSize={fSize}
+                          fontFamily="Outfit, sans-serif"
+                          fontWeight="700"
                           textAnchor="middle"
                         >
-                          {room.dim} ({room.sqft} sq.ft)
+                          {room.name.length > maxChars ? room.name.substring(0, maxChars - 2) + '..' : room.name}
                         </text>
-                      )}
-                    </g>
-                  )}
+                        {layers.dimensions && (
+                          <text
+                            x={room.x + room.w / 2}
+                            y={by + 21}
+                            fill="#fbbf24"
+                            fontSize={Math.max(6.5, fSize - 1.5)}
+                            fontFamily="monospace"
+                            fontWeight="bold"
+                            textAnchor="middle"
+                          >
+                            {bw < 75 ? `${room.sqft} sqft` : `${room.dim} (${room.sqft} sq.ft)`}
+                          </text>
+                        )}
+                      </g>
+                    );
+                  })()}
 
                   {/* Doors Vector Arc Swings & Windows */}
                   {layers.doorsWindows && (

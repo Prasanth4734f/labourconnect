@@ -21,6 +21,7 @@ import {
   generateFloorPlanSvg, 
   deriveFloorWalls,
   deriveFloorOpenings,
+  layoutCadRoomLabel,
   DRAWING_ENGINE_VERSION,
   WALL_THICKNESS
 } from '../cad/floorPlanGenerator.js';
@@ -215,6 +216,14 @@ export function runFloorPlanGeneratorTests() {
     firstRoomEl.clearDimLabel !== undefined && firstRoomEl.nominalDimLabel !== undefined,
     'Test 3.9: Clear and nominal dimensions distinguished'
   );
+  assert(
+    planModel.roomElements.every(r => r.labelLayout && r.labelLayout.pillWidth > 0 && r.labelLayout.pillHeight > 0),
+    'Test 3.10: All room elements precompute anti-collision labelLayout'
+  );
+  assert(
+    planModel.roomElements.every(r => r.labelLayout.pillWidth <= (r.bounds.width * planModel.canvas.scale)),
+    'Test 3.11: Room label badge width never exceeds room horizontal width'
+  );
 
   // ---------------------------------------------------------------------------
   // CATEGORY 4: MULTI-TIER ARCHITECTURAL DIMENSION CHAINS
@@ -291,6 +300,7 @@ export function runFloorPlanGeneratorTests() {
   // Layer toggle test
   const svgNoDims = generateFloorPlanSvg(compactDesign, { floorIndex: 0, showDimensions: false });
   assert(!svgNoDims.includes('id="layer-dimensions"'), 'Test 6.13: Dimension layer safely toggled off');
+  assert(svgOutput.includes('class="cad-room-badge"'), 'Test 6.14: Anti-collision architectural room badges rendered in SVG');
 
   // ---------------------------------------------------------------------------
   // CATEGORY 7: MALFORMED INPUT & ERROR HANDLING

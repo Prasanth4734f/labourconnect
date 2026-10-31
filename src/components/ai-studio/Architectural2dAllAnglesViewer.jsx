@@ -10,6 +10,7 @@ import {
   generateFloorPlanSvg,
   buildProcedural3dGeometry,
   projectOrthographicElevation,
+  layoutCadRoomLabel,
   CAD_COLORS,
   CAD_LINE_WEIGHTS
 } from '../../engine/index.js';
@@ -721,28 +722,49 @@ export default function Architectural2dAllAnglesViewer({
                         return (
                           <g key={col.id}>
                             <rect x={cx} y={cy} width={cw} height={cl} fill="url(#rccHatch)" stroke={CAD_COLORS.COLUMN} strokeWidth={CAD_LINE_WEIGHTS.COLUMN_OUTLINE} />
-                            <text x={cx + cw / 2} y={cy - 3} fontSize="6.5" fontWeight="800" textAnchor="middle" fill={CAD_COLORS.COLUMN}>{col.id}</text>
+                            <text x={cx + cw / 2} y={cy - 3} fontSize="6.5" fontWeight="800" textAnchor="middle" fill={CAD_COLORS.COLUMN} stroke="#FFFFFF" strokeWidth="2.5" paintOrder="stroke fill">{col.id}</text>
                           </g>
                         );
                       })}
                     </g>
                   )}
 
-                  {/* Room Labels and Dimensions */}
+                  {/* Room Labels and Dimensions (Anti-Collision Architectural Badges) */}
                   {showRoomLabels && (
                     <g id="layer-labels">
                       {roomElements.map((r) => {
-                        const cx = px(r.center.x);
-                        const cy = py(r.center.y);
+                        const layout = r.labelLayout || layoutCadRoomLabel(r, S, columns, px, py, M);
+                        const bx = layout.badgeX;
+                        const by = layout.badgeY;
+                        const bw = layout.pillWidth;
+                        const bh = layout.pillHeight;
 
                         return (
-                          <g key={`lbl-${r.id}`}>
-                            <text x={cx} y={cy - 4} textAnchor="middle" fontSize="9.5" fontWeight="800" fill={CAD_COLORS.ROOM_LABEL}>
-                              {r.name.toUpperCase()}
-                            </text>
-                            <text x={cx} y={cy + 9} textAnchor="middle" fontSize="8" fontWeight="700" fill={CAD_COLORS.ROOM_DIM_TEXT}>
-                              {r.nominalDimLabel} ({r.areaSqft} sq.ft)
-                            </text>
+                          <g key={`lbl-${r.id}`} className="cad-room-badge" pointerEvents="none">
+                            <rect
+                              x={bx}
+                              y={by}
+                              width={bw}
+                              height={bh}
+                              rx={4}
+                              fill="rgba(255, 255, 255, 0.94)"
+                              stroke="#CBD5E1"
+                              strokeWidth="0.8"
+                            />
+                            {layout.renderedLines.map((line, lIdx) => (
+                              <text
+                                key={`line-${lIdx}`}
+                                x={line.x}
+                                y={line.y}
+                                textAnchor="middle"
+                                dominantBaseline="central"
+                                fontSize={line.fontSize}
+                                fontWeight={line.fontWeight}
+                                fill={line.color}
+                              >
+                                {line.text}
+                              </text>
+                            ))}
                           </g>
                         );
                       })}
@@ -868,30 +890,53 @@ export default function Architectural2dAllAnglesViewer({
                     )}
 
                     {/* Room Labels & Dimensions */}
-                    {showRoomLabels && (
-                      <g>
-                        <text
-                          x={room.x + room.w / 2}
-                          y={room.y + room.h / 2 - 4}
-                          textAnchor="middle"
-                          fontSize="9.5"
-                          fontWeight="800"
-                          fill="#1e293b"
-                        >
-                          {room.name}
-                        </text>
-                        <text
-                          x={room.x + room.w / 2}
-                          y={room.y + room.h / 2 + 10}
-                          textAnchor="middle"
-                          fontSize="8.5"
-                          fontWeight="700"
-                          fill="#718B73"
-                        >
-                          {room.dim} ({room.sqft} sq.ft)
-                        </text>
-                      </g>
-                    )}
+                    {showRoomLabels && (() => {
+                      const maxAvailW = Math.max(30, room.w - 10);
+                      const maxAvailH = Math.max(22, room.h - 8);
+                      const rawName = (room.name || 'ROOM').toUpperCase();
+                      const shortName = maxAvailW < 75
+                        ? rawName.replace(/ & .*/g, '').replace(/ (SUITE|LOUNGE|SANCTUM|AREA)/g, '')
+                        : rawName;
+                      const fSize = maxAvailW < 70 ? 7 : maxAvailW < 100 ? 8 : 9;
+                      const bw = Math.min(maxAvailW, Math.max(36, Math.round(shortName.length * fSize * 0.58 + 14)));
+                      const bh = Math.min(maxAvailH, 30);
+                      const bx = room.x + room.w / 2 - bw / 2;
+                      const by = room.y + room.h / 2 - bh / 2;
+                      return (
+                        <g pointerEvents="none">
+                          <rect
+                            x={bx}
+                            y={by}
+                            width={bw}
+                            height={bh}
+                            rx="4"
+                            fill="rgba(255, 255, 255, 0.94)"
+                            stroke="#CBD5E1"
+                            strokeWidth="0.8"
+                          />
+                          <text
+                            x={room.x + room.w / 2}
+                            y={by + 11}
+                            textAnchor="middle"
+                            fontSize={fSize}
+                            fontWeight="800"
+                            fill="#0F172A"
+                          >
+                            {shortName}
+                          </text>
+                          <text
+                            x={room.x + room.w / 2}
+                            y={by + 22}
+                            textAnchor="middle"
+                            fontSize={Math.max(5.5, fSize - 1.2)}
+                            fontWeight="700"
+                            fill="#059669"
+                          >
+                            {maxAvailW < 70 ? `${room.sqft} sq.ft` : `${room.dim} (${room.sqft} sq.ft)`}
+                          </text>
+                        </g>
+                      );
+                    })()}
 
                     {/* Door Swing Arc */}
                     <path

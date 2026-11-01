@@ -761,8 +761,10 @@ export default function Architectural2dAllAnglesViewer({
                                 fontSize={line.fontSize}
                                 fontWeight={line.fontWeight}
                                 fill={line.color}
-                                textLength={line.textLength || undefined}
-                                lengthAdjust={line.textLength ? 'spacingAndGlyphs' : undefined}
+                                stroke="#FFFFFF"
+                                strokeWidth="2"
+                                paintOrder="stroke fill"
+                                fontFamily="system-ui, -apple-system, sans-serif"
                               >
                                 {line.text}
                               </text>
@@ -923,6 +925,10 @@ export default function Architectural2dAllAnglesViewer({
                             fontSize={fSize}
                             fontWeight="800"
                             fill="#0F172A"
+                            stroke="#FFFFFF"
+                            strokeWidth="2"
+                            paintOrder="stroke fill"
+                            fontFamily="system-ui, -apple-system, sans-serif"
                           >
                             {shortName}
                           </text>
@@ -933,6 +939,10 @@ export default function Architectural2dAllAnglesViewer({
                             fontSize={Math.max(5.5, fSize - 1.2)}
                             fontWeight="700"
                             fill="#059669"
+                            stroke="#FFFFFF"
+                            strokeWidth="1.8"
+                            paintOrder="stroke fill"
+                            fontFamily="system-ui, -apple-system, sans-serif"
                           >
                             {maxAvailW < 70 ? `${room.sqft} sq.ft` : `${room.dim} (${room.sqft} sq.ft)`}
                           </text>

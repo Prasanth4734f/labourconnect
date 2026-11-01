@@ -66,20 +66,18 @@ export function getArchetypeStairwellBounds(archetype, env, options = {}) {
     const rearWingL = Number((L - courtL).toFixed(2));
     const yRear = Number((env.y + courtL).toFixed(2));
     const stairW = Number(Math.max(7.0, Math.min(8.5, W * 0.20)).toFixed(2));
-    const stairL = Number(Math.max(12.0, Math.min(15.0, rearWingL * 0.52)).toFixed(2));
+    const stairL = Number(Math.max(12.0, Math.min(15.0, rearWingL * 0.55)).toFixed(2));
     return { x: env.x, y: yRear, width: stairW, length: stairL };
   }
 
   if (archetype === 'split_wing_zoned') {
     const wing1W = Number((W * 0.52).toFixed(2));
-    const wing2W = Number((W - wing1W).toFixed(2));
-    const offset = Number(Math.max(6.0, Math.min(10.0, L * 0.22)).toFixed(2));
-    const lWing2 = Number((L - offset).toFixed(2));
-    const stairW = Number(Math.max(6.5, Math.min(8.0, wing2W * 0.45)).toFixed(2));
-    const stairL = Number(Math.max(12.0, Math.min(15.0, lWing2 * 0.36)).toFixed(2));
-    const stairX = Number((env.x + wing1W).toFixed(2));
-    const stairY = Number((env.y + offset).toFixed(2));
-    return { x: stairX, y: stairY, width: stairW, length: stairL };
+    const wing2W = Number((W * 0.52).toFixed(2));
+    const coreW = Number((wing1W + wing2W - W).toFixed(2));
+    const xCore = Number((env.x + wing1W - coreW).toFixed(2));
+    const yCore = Number((env.y + L * 0.40).toFixed(2));
+    const coreL = Number(Math.max(13.0, Math.min(16.0, L * 0.35)).toFixed(2));
+    return { x: xCore, y: yCore, width: coreW, length: coreL };
   }
 
   if (archetype === 'villa_pavilion') {
@@ -629,13 +627,13 @@ export function solveLShapeGroundLayout({ env, specs, floorProg, stairwellBounds
   }
 
   // 2. REAR MAIN WING (Spans full width W from yRear to env.y + L)
-  const row1L = stairwellBounds ? Number(stairwellBounds.length.toFixed(2)) : Number((rearWingL * 0.52).toFixed(2));
-  const row2L = Number(((env.y + L) - (yRear + row1L)).toFixed(2));
+  const row1L = Number((rearWingL * 0.52).toFixed(2));
+  const row2L = Number((rearWingL - row1L).toFixed(2));
   const yRow2 = Number((yRear + row1L).toFixed(2));
 
   // Row 1: Aligned Staircase + Dining/Pooja + Living facing the Garden Court
   const stairW = stairwellBounds ? stairwellBounds.width : Number(Math.min(7.5, W * 0.20).toFixed(2));
-  const stairL = row1L;
+  const stairL = stairwellBounds ? stairwellBounds.length : row1L;
   const livingW = Number((courtW * 0.85).toFixed(2));
   const diningW = Number((W - stairW - livingW).toFixed(2));
 
@@ -1019,8 +1017,8 @@ export function solveSplitWingGroundLayout({ env, specs, floorProg, stairwellBou
   const isPoojaDisabled = specs.amenities?.hasPooja === false || specs.hasPooja === false;
 
   // Staggered Offset:
-  // Wing 1 (Front Left): Starts at front y = env.y, projects forward.
-  // Wing 2 (Rear Right): Offset by 22% of L, extends to rear boundary.
+  // Wing 1 (Front Left): Starts at front y = env.y, projects forward. Depth 75% of L.
+  // Wing 2 (Rear Right): Offset by 22% of L, extends to rear property line.
   const wing1W = Number((W * 0.52).toFixed(2));
   const wing2W = Number((W - wing1W).toFixed(2));
   const offset = Number(Math.max(6.0, Math.min(10.0, L * 0.22)).toFixed(2));
@@ -1030,14 +1028,10 @@ export function solveSplitWingGroundLayout({ env, specs, floorProg, stairwellBou
   const yWing2 = Number((env.y + offset).toFixed(2));
   const lWing2 = Number((L - offset).toFixed(2));
 
-  // --- WING 1 (Front Left, width wing1W):
-  // 1. Portico / Foyer at Front
-  const porticoL = Number(Math.max(7.5, Math.min(9.5, lWing1 * 0.22)).toFixed(2));
-  const livingL = Number(Math.max(13.0, Math.min(18.0, lWing1 * 0.44)).toFixed(2));
-  const bedMasterL = Number((lWing1 - porticoL - livingL).toFixed(2));
-
+  // --- WING 1 (Front Left): Portico + Foyer + Double-Height Formal Living
+  const porticoL = Number(Math.max(7.5, Math.min(10.0, lWing1 * 0.26)).toFixed(2));
+  const livingL = Number((lWing1 - porticoL).toFixed(2));
   const yLiving = Number((yWing1 + porticoL).toFixed(2));
-  const yBedMaster = Number((yLiving + livingL).toFixed(2));
 
   if (hasParking) {
     rooms.push(createPlacedRoomRecord({
@@ -1065,7 +1059,7 @@ export function solveSplitWingGroundLayout({ env, specs, floorProg, stairwellBou
     }));
   }
 
-  // 2. Formal Living Lounge in Wing 1 Mid
+  // Formal Living Lounge in Wing 1
   rooms.push(createPlacedRoomRecord({
     id: 'g_living',
     name: 'Double-Height Formal Living Lounge',
@@ -1079,63 +1073,28 @@ export function solveSplitWingGroundLayout({ env, specs, floorProg, stairwellBou
     ],
     windows: [
       { x: env.x, y: Number((yLiving + livingL / 2).toFixed(2)), width: 6.0, wall: 'west', label: 'Full-Height Window' },
-      { x: Number((env.x + wing1W / 2).toFixed(2)), y: yBedMaster, width: 3.5, wall: 'south' }
+      { x: Number((env.x + wing1W / 2).toFixed(2)), y: Number((yLiving + livingL).toFixed(2)), width: 5.0, wall: 'south' }
     ]
   }));
 
-  // 3. Ground Master Bedroom Suite + Master En-suite Bath in Wing 1 Rear
-  const bathSuiteW = Number(Math.max(4.5, Math.min(6.0, wing1W * 0.30)).toFixed(2));
-  const bedMasterW = Number((wing1W - bathSuiteW).toFixed(2));
-
-  const bedMasterX = env.x;
-  const bathSuiteX = Number((env.x + bedMasterW).toFixed(2));
-
-  rooms.push(createPlacedRoomRecord({
-    id: 'g_bed_master',
-    name: 'Ground Master Bedroom Suite',
-    type: ROOM_TYPES.MASTER_BEDROOM,
-    zone: ZONES.PRIVATE,
-    bounds: { x: bedMasterX, y: yBedMaster, width: bedMasterW, length: bedMasterL },
-    finish: 'Matte Oak Hardwood Vitrified',
-    orientation: 'South-West',
-    doors: [
-      { x: Number((bedMasterX + bedMasterW / 2).toFixed(2)), y: yBedMaster, width: 3.0, wall: 'north' },
-      { x: Number((bedMasterX + bedMasterW).toFixed(2)), y: Number((yBedMaster + bedMasterL / 2).toFixed(2)), width: 2.5, wall: 'east', label: 'En-suite Door' }
-    ],
-    windows: [
-      { x: bedMasterX, y: Number((yBedMaster + bedMasterL / 2).toFixed(2)), width: 5.0, wall: 'west' },
-      { x: Number((bedMasterX + bedMasterW / 2).toFixed(2)), y: Number((yBedMaster + bedMasterL).toFixed(2)), width: 4.5, wall: 'south' }
-    ]
-  }));
-
-  rooms.push(createPlacedRoomRecord({
-    id: 'g_bath_suite',
-    name: 'Master En-suite Bathroom',
-    type: ROOM_TYPES.BATHROOM,
-    zone: ZONES.SERVICE,
-    bounds: { x: bathSuiteX, y: yBedMaster, width: bathSuiteW, length: bedMasterL },
-    finish: 'Anti-skid Flamed Granite',
-    orientation: 'South',
-    doors: [{ x: bathSuiteX, y: Number((yBedMaster + bedMasterL / 2).toFixed(2)), width: 2.5, wall: 'west' }],
-    windows: [{ x: Number((bathSuiteX + bathSuiteW / 2).toFixed(2)), y: Number((yBedMaster + bedMasterL).toFixed(2)), width: 2.0, wall: 'south', label: 'Vent' }]
-  }));
-
-  // --- WING 2 (Rear Right, starts at yWing2, width wing2W):
-  // 1. Aligned Staircase + Ishanya Pooja / Lobby at Front of Wing 2
+  // --- WING 2 (Rear Right, starts at yWing2): Staircase + Dining + Pooja + Kitchen + Master Suite
   const wing2X = Number((env.x + wing1W).toFixed(2));
-  const stairW = stairwellBounds ? stairwellBounds.width : Number(Math.max(6.5, Math.min(8.0, wing2W * 0.45)).toFixed(2));
-  const stairL = stairwellBounds ? stairwellBounds.length : Number(Math.max(12.0, Math.min(15.0, lWing2 * 0.36)).toFixed(2));
+  const rowDiningL = Number((lWing2 * 0.44).toFixed(2));
+  const rowBedL = Number((lWing2 - rowDiningL).toFixed(2));
+  const yRowBed = Number((yWing2 + rowDiningL).toFixed(2));
+
+  // Aligned Staircase placed at front of Wing 2
+  const stairW = stairwellBounds ? stairwellBounds.width : Number(Math.min(7.5, wing2W * 0.40).toFixed(2));
+  const diningW = Number((wing2W - stairW).toFixed(2));
+  const stairX = wing2X;
+  const diningX = Number((stairX + stairW).toFixed(2));
 
   const effectiveStairBounds = stairwellBounds || {
-    x: wing2X,
+    x: stairX,
     y: yWing2,
     width: stairW,
-    length: stairL
+    length: rowDiningL
   };
-
-  const actualStairL = Number(effectiveStairBounds.length.toFixed(2));
-  const poojaW = Number((wing2W - effectiveStairBounds.width).toFixed(2));
-  const poojaX = Number((wing2X + effectiveStairBounds.width).toFixed(2));
 
   rooms.push(createPlacedRoomRecord({
     id: 'g_stairwell_core',
@@ -1149,87 +1108,165 @@ export function solveSplitWingGroundLayout({ env, specs, floorProg, stairwellBou
     windows: [{ x: effectiveStairBounds.x, y: Number((effectiveStairBounds.y + effectiveStairBounds.length / 2).toFixed(2)), width: 3.0, wall: 'west' }]
   }));
 
+  // Dining and Pooja in remainder of Wing 2 front row
   if (!isPoojaDisabled) {
+    const poojaL = Number(Math.max(3.5, Math.min(5.5, rowDiningL * 0.35)).toFixed(2));
+    const mainDiningL = Number((rowDiningL - poojaL).toFixed(2));
+
     rooms.push(createPlacedRoomRecord({
       id: 'g_pooja',
       name: 'Ishanya Pooja Sanctum',
       type: ROOM_TYPES.POOJA,
       zone: ZONES.SEMI_PRIVATE,
-      bounds: { x: poojaX, y: yWing2, width: poojaW, length: actualStairL },
+      bounds: { x: diningX, y: yWing2, width: diningW, length: poojaL },
       finish: 'White Makrana Carved Marble',
       orientation: 'North-East',
-      doors: [{ x: poojaX, y: Number((yWing2 + actualStairL / 2).toFixed(2)), width: 2.5, wall: 'west', label: 'Brass Jali Door' }],
-      windows: [{ x: Number((poojaX + poojaW).toFixed(2)), y: Number((yWing2 + actualStairL / 2).toFixed(2)), width: 3.0, wall: 'east' }]
+      doors: [{ x: Number((diningX + diningW / 2).toFixed(2)), y: Number((yWing2 + poojaL).toFixed(2)), width: 2.5, wall: 'south', label: 'Jali Door' }],
+      windows: [{ x: Number((diningX + diningW).toFixed(2)), y: Number((yWing2 + poojaL / 2).toFixed(2)), width: 3.0, wall: 'east' }]
+    }));
+
+    rooms.push(createPlacedRoomRecord({
+      id: 'g_dining',
+      name: 'Central Dining Area',
+      type: ROOM_TYPES.DINING,
+      zone: ZONES.SEMI_PRIVATE,
+      bounds: { x: diningX, y: Number((yWing2 + poojaL).toFixed(2)), width: diningW, length: mainDiningL },
+      finish: 'Polished Vitrified 800×1600mm',
+      orientation: 'East',
+      doors: [
+        { x: diningX, y: Number((yWing2 + poojaL + mainDiningL / 2).toFixed(2)), width: 3.5, wall: 'west', label: 'Stair/Living Portal' },
+        { x: Number((diningX + diningW / 2).toFixed(2)), y: yRowBed, width: 3.0, wall: 'south', label: 'Kitchen Door' }
+      ],
+      windows: [{ x: Number((diningX + diningW).toFixed(2)), y: Number((yWing2 + poojaL + mainDiningL / 2).toFixed(2)), width: 4.5, wall: 'east' }]
     }));
   } else {
     rooms.push(createPlacedRoomRecord({
-      id: 'g_foyer_inner',
-      name: 'East Wing Gallery Lobby',
-      type: ROOM_TYPES.FOYER,
-      zone: ZONES.PUBLIC,
-      bounds: { x: poojaX, y: yWing2, width: poojaW, length: actualStairL },
+      id: 'g_dining',
+      name: 'Central Dining Area',
+      type: ROOM_TYPES.DINING,
+      zone: ZONES.SEMI_PRIVATE,
+      bounds: { x: diningX, y: yWing2, width: diningW, length: rowDiningL },
       finish: 'Polished Vitrified 800×1600mm',
       orientation: 'East',
-      doors: [{ x: poojaX, y: Number((yWing2 + actualStairL / 2).toFixed(2)), width: 3.0, wall: 'west' }],
-      windows: [{ x: Number((poojaX + poojaW).toFixed(2)), y: Number((yWing2 + actualStairL / 2).toFixed(2)), width: 4.0, wall: 'east' }]
+      doors: [
+        { x: diningX, y: Number((yWing2 + rowDiningL / 2).toFixed(2)), width: 3.5, wall: 'west', label: 'Stair/Living Portal' },
+        { x: Number((diningX + diningW / 2).toFixed(2)), y: yRowBed, width: 3.0, wall: 'south', label: 'Kitchen Door' }
+      ],
+      windows: [{ x: Number((diningX + diningW).toFixed(2)), y: Number((yWing2 + rowDiningL / 2).toFixed(2)), width: 5.0, wall: 'east' }]
     }));
   }
 
-  // 2. Central Dining in Wing 2 Mid
-  const yDining = Number((yWing2 + actualStairL).toFixed(2));
-  const remL = Number(((yWing2 + lWing2) - yDining).toFixed(2));
-  const diningL = Number(Math.max(10.0, Math.min(14.0, remL * 0.48)).toFixed(2));
-  const rearL = Number((remL - diningL).toFixed(2));
-  const yRear = Number((yDining + diningL).toFixed(2));
+  // Rear of Wing 2: Kitchen + Master Bedroom Suite + 2 Baths
+  const needsTwoGroundBaths = (specs.bathroomsCount >= 4) || (floorProg.rooms?.filter(r => r.type === ROOM_TYPES.BATHROOM).length >= 2);
 
-  rooms.push(createPlacedRoomRecord({
-    id: 'g_dining',
-    name: 'Central Dining Area',
-    type: ROOM_TYPES.DINING,
-    zone: ZONES.SEMI_PRIVATE,
-    bounds: { x: wing2X, y: yDining, width: wing2W, length: diningL },
-    finish: 'Polished Vitrified 800×1600mm',
-    orientation: 'East',
-    doors: [
-      { x: wing2X, y: Number((yDining + diningL / 2).toFixed(2)), width: 3.5, wall: 'west', label: 'Living Room Spine' },
-      { x: Number((wing2X + wing2W / 2).toFixed(2)), y: yRear, width: 3.0, wall: 'south', label: 'Kitchen Door' }
-    ],
-    windows: [{ x: Number((wing2X + wing2W).toFixed(2)), y: Number((yDining + diningL / 2).toFixed(2)), width: 5.0, wall: 'east' }]
-  }));
+  if (needsTwoGroundBaths) {
+    const bathW = Number(Math.max(4.0, Math.min(5.5, wing2W * 0.22)).toFixed(2));
+    const kitchW = Number(Math.max(7.5, Math.min(10.5, wing2W * 0.40)).toFixed(2));
+    const bedW = Number((wing2W - (bathW * 2) - kitchW).toFixed(2));
 
-  // 3. Gourmet Kitchen + Common Sanitary Bath in Wing 2 Rear
-  const bathCommonW = Number(Math.max(4.5, Math.min(6.0, wing2W * 0.32)).toFixed(2));
-  const kitchW = Number((wing2W - bathCommonW).toFixed(2));
+    const kitchX = wing2X;
+    const bathCommonX = Number((kitchX + kitchW).toFixed(2));
+    const bathSuiteX = Number((bathCommonX + bathW).toFixed(2));
+    const bedX = Number((bathSuiteX + bathW).toFixed(2));
 
-  const kitchX = wing2X;
-  const bathCommonX = Number((wing2X + kitchW).toFixed(2));
+    rooms.push(createPlacedRoomRecord({
+      id: 'g_kitchen',
+      name: 'Modular Gourmet Kitchen',
+      type: ROOM_TYPES.KITCHEN,
+      zone: ZONES.SERVICE,
+      bounds: { x: kitchX, y: yRowBed, width: kitchW, length: rowBedL },
+      finish: 'Quartz Countertop + Matte Tiles',
+      orientation: 'South',
+      doors: [{ x: Number((kitchX + kitchW / 2).toFixed(2)), y: yRowBed, width: 3.0, wall: 'north' }],
+      windows: [{ x: Number((kitchX + kitchW / 2).toFixed(2)), y: Number((yRowBed + rowBedL).toFixed(2)), width: 4.0, wall: 'south' }]
+    }));
 
-  rooms.push(createPlacedRoomRecord({
-    id: 'g_kitchen',
-    name: 'Modular Gourmet Kitchen',
-    type: ROOM_TYPES.KITCHEN,
-    zone: ZONES.SERVICE,
-    bounds: { x: kitchX, y: yRear, width: kitchW, length: rearL },
-    finish: 'Quartz Countertop + Matte Tiles',
-    orientation: 'South',
-    doors: [{ x: Number((kitchX + kitchW / 2).toFixed(2)), y: yRear, width: 3.0, wall: 'north' }],
-    windows: [{ x: Number((kitchX + kitchW / 2).toFixed(2)), y: Number((yRear + rearL).toFixed(2)), width: 4.0, wall: 'south' }]
-  }));
+    rooms.push(createPlacedRoomRecord({
+      id: 'g_bath_common',
+      name: 'Sanitary Bath & Powder',
+      type: ROOM_TYPES.BATHROOM,
+      zone: ZONES.SERVICE,
+      bounds: { x: bathCommonX, y: yRowBed, width: bathW, length: rowBedL },
+      finish: 'Anti-skid Ceramic Vitrified',
+      orientation: 'South',
+      doors: [{ x: Number((bathCommonX + bathW / 2).toFixed(2)), y: yRowBed, width: 2.5, wall: 'north' }],
+      windows: [{ x: Number((bathCommonX + bathW / 2).toFixed(2)), y: Number((yRowBed + rowBedL).toFixed(2)), width: 2.0, wall: 'south', label: 'Vent' }]
+    }));
 
-  rooms.push(createPlacedRoomRecord({
-    id: 'g_bath_common',
-    name: 'Sanitary Bath & Powder',
-    type: ROOM_TYPES.BATHROOM,
-    zone: ZONES.SERVICE,
-    bounds: { x: bathCommonX, y: yRear, width: bathCommonW, length: rearL },
-    finish: 'Anti-skid Ceramic Vitrified',
-    orientation: 'South-East',
-    doors: [{ x: Number((bathCommonX + bathCommonW / 2).toFixed(2)), y: yRear, width: 2.5, wall: 'north' }],
-    windows: [
-      { x: Number((bathCommonX + bathCommonW).toFixed(2)), y: Number((yRear + rearL / 2).toFixed(2)), width: 2.0, wall: 'east', label: 'Vent' },
-      { x: Number((bathCommonX + bathCommonW / 2).toFixed(2)), y: Number((yRear + rearL).toFixed(2)), width: 2.0, wall: 'south', label: 'Vent' }
-    ]
-  }));
+    rooms.push(createPlacedRoomRecord({
+      id: 'g_bath_suite',
+      name: 'Master En-suite Bathroom',
+      type: ROOM_TYPES.BATHROOM,
+      zone: ZONES.SERVICE,
+      bounds: { x: bathSuiteX, y: yRowBed, width: bathW, length: rowBedL },
+      finish: 'Anti-skid Flamed Granite',
+      orientation: 'South',
+      doors: [{ x: Number((bathSuiteX + bathW).toFixed(2)), y: Number((yRowBed + rowBedL / 2).toFixed(2)), width: 2.5, wall: 'east' }],
+      windows: [{ x: Number((bathSuiteX + bathW / 2).toFixed(2)), y: Number((yRowBed + rowBedL).toFixed(2)), width: 2.0, wall: 'south', label: 'Vent' }]
+    }));
+
+    rooms.push(createPlacedRoomRecord({
+      id: 'g_bed_master',
+      name: 'Ground Master Bedroom Suite',
+      type: ROOM_TYPES.MASTER_BEDROOM,
+      zone: ZONES.PRIVATE,
+      bounds: { x: bedX, y: yRowBed, width: bedW, length: rowBedL },
+      finish: 'Matte Oak Hardwood Vitrified',
+      orientation: 'South-East',
+      doors: [
+        { x: Number((bedX + bedW / 2).toFixed(2)), y: yRowBed, width: 3.0, wall: 'north' },
+        { x: bedX, y: Number((yRowBed + rowBedL / 2).toFixed(2)), width: 2.5, wall: 'west', label: 'En-suite Door' }
+      ],
+      windows: [
+        { x: Number((bedX + bedW).toFixed(2)), y: Number((yRowBed + rowBedL / 2).toFixed(2)), width: 5.0, wall: 'east' },
+        { x: Number((bedX + bedW / 2).toFixed(2)), y: Number((yRowBed + rowBedL).toFixed(2)), width: 4.5, wall: 'south' }
+      ]
+    }));
+  } else {
+    const bathW = Number(Math.max(4.5, Math.min(6.5, wing2W * 0.25)).toFixed(2));
+    const kitchW = Number(Math.max(8.0, Math.min(11.0, wing2W * 0.40)).toFixed(2));
+    const bedW = Number((wing2W - bathW - kitchW).toFixed(2));
+
+    const kitchX = wing2X;
+    const bathX = Number((kitchX + kitchW).toFixed(2));
+    const bedX = Number((bathX + bathW).toFixed(2));
+
+    rooms.push(createPlacedRoomRecord({
+      id: 'g_kitchen',
+      name: 'Modular Gourmet Kitchen',
+      type: ROOM_TYPES.KITCHEN,
+      zone: ZONES.SERVICE,
+      bounds: { x: kitchX, y: yRowBed, width: kitchW, length: rowBedL },
+      finish: 'Quartz Countertop + Matte Tiles',
+      orientation: 'South',
+      doors: [{ x: Number((kitchX + kitchW / 2).toFixed(2)), y: yRowBed, width: 3.0, wall: 'north' }],
+      windows: [{ x: Number((kitchX + kitchW / 2).toFixed(2)), y: Number((yRowBed + rowBedL).toFixed(2)), width: 4.0, wall: 'south' }]
+    }));
+
+    rooms.push(createPlacedRoomRecord({
+      id: 'g_bath_common',
+      name: 'Sanitary Bath & Toilet',
+      type: ROOM_TYPES.BATHROOM,
+      zone: ZONES.SERVICE,
+      bounds: { x: bathX, y: yRowBed, width: bathW, length: rowBedL },
+      finish: 'Anti-skid Ceramic Vitrified',
+      orientation: 'South',
+      doors: [{ x: Number((bathX + bathW / 2).toFixed(2)), y: yRowBed, width: 2.5, wall: 'north' }],
+      windows: [{ x: Number((bathX + bathW / 2).toFixed(2)), y: Number((yRowBed + rowBedL).toFixed(2)), width: 2.0, wall: 'south', label: 'Vent' }]
+    }));
+
+    rooms.push(createPlacedRoomRecord({
+      id: 'g_bed_master',
+      name: 'Ground Master Bedroom Suite',
+      type: ROOM_TYPES.MASTER_BEDROOM,
+      zone: ZONES.PRIVATE,
+      bounds: { x: bedX, y: yRowBed, width: bedW, length: rowBedL },
+      finish: 'Matte Oak Hardwood Vitrified',
+      orientation: 'South-East',
+      doors: [{ x: Number((bedX + bedW / 2).toFixed(2)), y: yRowBed, width: 3.0, wall: 'north' }],
+      windows: [{ x: Number((bedX + bedW).toFixed(2)), y: Number((yRowBed + rowBedL / 2).toFixed(2)), width: 4.5, wall: 'east' }]
+    }));
+  }
 
   const footprints = [
     { x: env.x, y: yWing1, width: wing1W, length: lWing1 },
@@ -1253,66 +1290,39 @@ export function solveSplitWingUpperLayout({ env, specs, floorProg, stairwellBoun
   const yWing2 = Number((env.y + offset).toFixed(2));
   const lWing2 = Number((L - offset).toFixed(2));
 
-  // --- WING 1 (Front Left): Balcony + Family Lounge + Bedroom 2 + En-suite Bath 3
-  const balcL = Number(Math.max(5.5, Math.min(8.0, lWing1 * 0.22)).toFixed(2));
-  const loungeL = Number(Math.max(12.0, Math.min(16.0, lWing1 * 0.42)).toFixed(2));
-  const bed2L = Number((lWing1 - balcL - loungeL).toFixed(2));
-
-  const yBalc = yWing1;
-  const yLounge = Number((yWing1 + balcL).toFixed(2));
-  const yBed2 = Number((yLounge + loungeL).toFixed(2));
+  // Wing 1 (Front Left): Cantilever Balcony + Upper Bedroom 2 + En-suite Bath
+  const balcL = Number(Math.max(5.5, Math.min(8.0, lWing1 * 0.24)).toFixed(2));
+  const bed1L = Number((lWing1 - balcL).toFixed(2));
+  const yBed1 = Number((yWing1 + balcL).toFixed(2));
 
   rooms.push(createPlacedRoomRecord({
     id: 'f_balcony',
     name: 'Cantilever Glass Balcony Deck',
     type: ROOM_TYPES.BALCONY,
     zone: ZONES.OUTDOOR,
-    bounds: { x: env.x, y: yBalc, width: wing1W, length: balcL },
+    bounds: { x: env.x, y: yWing1, width: wing1W, length: balcL },
     finish: 'Weatherproof WPC Wood Planks',
     orientation: specs.facingDirection || 'East',
-    doors: [{ x: Number((env.x + wing1W / 2).toFixed(2)), y: yLounge, width: 4.5, wall: 'south', label: 'Glass Sliding Door' }],
+    doors: [{ x: Number((env.x + wing1W / 2).toFixed(2)), y: yBed1, width: 4.5, wall: 'south', label: 'Glass Sliding Door' }],
     windows: []
   }));
 
-  rooms.push(createPlacedRoomRecord({
-    id: 'f_family_lounge',
-    name: 'Upper Family Media Lounge & Study',
-    type: ROOM_TYPES.LIVING,
-    zone: ZONES.SEMI_PRIVATE,
-    bounds: { x: env.x, y: yLounge, width: wing1W, length: loungeL },
-    finish: 'Italian Vitrified 800×1600mm',
-    orientation: 'North-West',
-    doors: [
-      { x: Number((env.x + wing1W / 2).toFixed(2)), y: yLounge, width: 4.5, wall: 'north', label: 'Balcony Portal' },
-      { x: Number((env.x + wing1W).toFixed(2)), y: Number((yLounge + loungeL / 2).toFixed(2)), width: 3.5, wall: 'east', label: 'Spine Walkway' },
-      { x: Number((env.x + wing1W / 2).toFixed(2)), y: yBed2, width: 3.0, wall: 'south', label: 'Bedroom 2 Lobby' }
-    ],
-    windows: [{ x: env.x, y: Number((yLounge + loungeL / 2).toFixed(2)), width: 5.5, wall: 'west' }]
-  }));
-
-  // Bedroom 2 + En-suite Bath 3 in Wing 1 Rear
-  const bath3W = Number(Math.max(4.5, Math.min(6.0, wing1W * 0.30)).toFixed(2));
-  const bed2W = Number((wing1W - bath3W).toFixed(2));
-
-  const bed2X = env.x;
-  const bath3X = Number((env.x + bed2W).toFixed(2));
+  const bathW = Number(Math.max(4.5, Math.min(6.0, wing1W * 0.32)).toFixed(2));
+  const mainBed1W = Number((wing1W - bathW).toFixed(2));
 
   rooms.push(createPlacedRoomRecord({
     id: 'f_bed_2',
     name: 'Secondary Bedroom Suite 2',
     type: ROOM_TYPES.BEDROOM,
     zone: ZONES.PRIVATE,
-    bounds: { x: bed2X, y: yBed2, width: bed2W, length: bed2L },
+    bounds: { x: env.x, y: yBed1, width: mainBed1W, length: bed1L },
     finish: 'Matte Oak Hardwood Vitrified',
-    orientation: 'South-West',
+    orientation: 'North-West',
     doors: [
-      { x: Number((bed2X + bed2W / 2).toFixed(2)), y: yBed2, width: 3.0, wall: 'north' },
-      { x: Number((bed2X + bed2W).toFixed(2)), y: Number((yBed2 + bed2L / 2).toFixed(2)), width: 2.5, wall: 'east', label: 'En-suite Door' }
+      { x: Number((env.x + mainBed1W / 2).toFixed(2)), y: yBed1, width: 4.5, wall: 'north', label: 'Balcony Portal' },
+      { x: Number((env.x + mainBed1W).toFixed(2)), y: Number((yBed1 + bed1L / 2).toFixed(2)), width: 2.5, wall: 'east', label: 'En-suite Door' }
     ],
-    windows: [
-      { x: bed2X, y: Number((yBed2 + bed2L / 2).toFixed(2)), width: 5.0, wall: 'west' },
-      { x: Number((bed2X + bed2W / 2).toFixed(2)), y: Number((yBed2 + bed2L).toFixed(2)), width: 4.5, wall: 'south' }
-    ]
+    windows: [{ x: env.x, y: Number((yBed1 + bed1L / 2).toFixed(2)), width: 5.0, wall: 'west' }]
   }));
 
   rooms.push(createPlacedRoomRecord({
@@ -1320,28 +1330,31 @@ export function solveSplitWingUpperLayout({ env, specs, floorProg, stairwellBoun
     name: 'Bedroom 2 En-suite Bath',
     type: ROOM_TYPES.BATHROOM,
     zone: ZONES.SERVICE,
-    bounds: { x: bath3X, y: yBed2, width: bath3W, length: bed2L },
+    bounds: { x: Number((env.x + mainBed1W).toFixed(2)), y: yBed1, width: bathW, length: bed1L },
     finish: 'Anti-skid Ceramic Vitrified',
     orientation: 'South',
-    doors: [{ x: bath3X, y: Number((yBed2 + bed2L / 2).toFixed(2)), width: 2.5, wall: 'west' }],
-    windows: [{ x: Number((bath3X + bath3W / 2).toFixed(2)), y: Number((yBed2 + bed2L).toFixed(2)), width: 2.0, wall: 'south', label: 'Vent' }]
+    doors: [{ x: Number((env.x + mainBed1W).toFixed(2)), y: Number((yBed1 + bed1L / 2).toFixed(2)), width: 2.5, wall: 'west' }],
+    windows: [{ x: Number((env.x + mainBed1W + bathW / 2).toFixed(2)), y: Number((yBed1 + bed1L).toFixed(2)), width: 2.0, wall: 'south', label: 'Vent' }]
   }));
 
-  // --- WING 2 (Rear Right): Aligned Staircase + Upper Study/Lobby + Guest Bedroom 3 + En-suite Bath 4
+  // Wing 2 (Rear Right): Aligned Staircase + Family Media Lounge + Upper Bedroom 3 + En-suite Bath
   const wing2X = Number((env.x + wing1W).toFixed(2));
-  const stairW = stairwellBounds ? stairwellBounds.width : Number(Math.max(6.5, Math.min(8.0, wing2W * 0.45)).toFixed(2));
-  const stairL = stairwellBounds ? stairwellBounds.length : Number(Math.max(12.0, Math.min(15.0, lWing2 * 0.36)).toFixed(2));
+  const rowLoungeL = Number((lWing2 * 0.44).toFixed(2));
+  const bed2L = Number((lWing2 - rowLoungeL).toFixed(2));
+  const yBed2 = Number((yWing2 + rowLoungeL).toFixed(2));
+
+  // Aligned Staircase at front of Wing 2
+  const stairW = stairwellBounds ? stairwellBounds.width : Number(Math.min(7.5, wing2W * 0.40).toFixed(2));
+  const loungeW = Number((wing2W - stairW).toFixed(2));
+  const stairX = wing2X;
+  const loungeX = Number((stairX + stairW).toFixed(2));
 
   const effectiveStairBounds = stairwellBounds || {
-    x: wing2X,
+    x: stairX,
     y: yWing2,
     width: stairW,
-    length: stairL
+    length: rowLoungeL
   };
-
-  const actualStairL = Number(effectiveStairBounds.length.toFixed(2));
-  const studyW = Number((wing2W - effectiveStairBounds.width).toFixed(2));
-  const studyX = Number((wing2X + effectiveStairBounds.width).toFixed(2));
 
   rooms.push(createPlacedRoomRecord({
     id: 'f_stairwell_core',
@@ -1356,56 +1369,51 @@ export function solveSplitWingUpperLayout({ env, specs, floorProg, stairwellBoun
   }));
 
   rooms.push(createPlacedRoomRecord({
-    id: 'f_study_nook',
-    name: 'Upper Gallery & Library Study',
-    type: ROOM_TYPES.FOYER,
+    id: 'f_family_lounge',
+    name: 'Upper Family Media Lounge & Study',
+    type: ROOM_TYPES.LIVING,
     zone: ZONES.SEMI_PRIVATE,
-    bounds: { x: studyX, y: yWing2, width: studyW, length: actualStairL },
-    finish: 'Polished Vitrified 800×1600mm',
+    bounds: { x: loungeX, y: yWing2, width: loungeW, length: rowLoungeL },
+    finish: 'Italian Vitrified 800×1600mm',
     orientation: 'North-East',
-    doors: [{ x: studyX, y: Number((yWing2 + actualStairL / 2).toFixed(2)), width: 3.0, wall: 'west' }],
-    windows: [{ x: Number((studyX + studyW).toFixed(2)), y: Number((yWing2 + actualStairL / 2).toFixed(2)), width: 4.0, wall: 'east' }]
-  }));
-
-  // Guest Bedroom 3 + En-suite Bath 4 in Wing 2 Rear
-  const yGuestSuite = Number((yWing2 + actualStairL).toFixed(2));
-  const guestSuiteL = Number(((yWing2 + lWing2) - yGuestSuite).toFixed(2));
-
-  const bath4W = Number(Math.max(4.5, Math.min(6.0, wing2W * 0.32)).toFixed(2));
-  const bed3W = Number((wing2W - bath4W).toFixed(2));
-
-  const bed3X = wing2X;
-  const bath4X = Number((wing2X + bed3W).toFixed(2));
-
-  rooms.push(createPlacedRoomRecord({
-    id: 'f_bed_3',
-    name: 'Upper Guest Bedroom 3',
-    type: ROOM_TYPES.BEDROOM,
-    zone: ZONES.PRIVATE,
-    bounds: { x: bed3X, y: yGuestSuite, width: bed3W, length: guestSuiteL },
-    finish: 'Matte Oak Hardwood Vitrified',
-    orientation: 'South',
     doors: [
-      { x: Number((bed3X + bed3W / 2).toFixed(2)), y: yGuestSuite, width: 3.0, wall: 'north', label: 'Guest Suite Lobby' },
-      { x: Number((bed3X + bed3W).toFixed(2)), y: Number((yGuestSuite + guestSuiteL / 2).toFixed(2)), width: 2.5, wall: 'east', label: 'En-suite Door' }
+      { x: loungeX, y: Number((yWing2 + rowLoungeL / 2).toFixed(2)), width: 3.5, wall: 'west', label: 'Spine Access' },
+      { x: Number((loungeX + loungeW / 2).toFixed(2)), y: yBed2, width: 3.0, wall: 'south', label: 'Guest Suite Lobby' }
     ],
-    windows: [
-      { x: Number((bed3X + bed3W / 2).toFixed(2)), y: Number((yGuestSuite + guestSuiteL).toFixed(2)), width: 4.5, wall: 'south' }
-    ]
+    windows: [{ x: Number((loungeX + loungeW).toFixed(2)), y: Number((yWing2 + rowLoungeL / 2).toFixed(2)), width: 5.5, wall: 'east' }]
   }));
+
+  // Rear of Wing 2: Upper Bedroom 3 + En-suite Bath
+  const bath2W = Number(Math.max(4.5, Math.min(6.0, wing2W * 0.35)).toFixed(2));
+  const mainBed2W = Number((wing2W - bath2W).toFixed(2));
 
   rooms.push(createPlacedRoomRecord({
     id: 'f_bath_4',
     name: 'Guest Bedroom En-suite Bath',
     type: ROOM_TYPES.BATHROOM,
     zone: ZONES.SERVICE,
-    bounds: { x: bath4X, y: yGuestSuite, width: bath4W, length: guestSuiteL },
+    bounds: { x: wing2X, y: yBed2, width: bath2W, length: bed2L },
     finish: 'Anti-skid Ceramic Vitrified',
+    orientation: 'South',
+    doors: [{ x: Number((wing2X + bath2W).toFixed(2)), y: Number((yBed2 + bed2L / 2).toFixed(2)), width: 2.5, wall: 'east' }],
+    windows: [{ x: Number((wing2X + bath2W / 2).toFixed(2)), y: Number((yBed2 + bed2L).toFixed(2)), width: 2.0, wall: 'south', label: 'Vent' }]
+  }));
+
+  rooms.push(createPlacedRoomRecord({
+    id: 'f_bed_3',
+    name: 'Upper Guest Bedroom 3',
+    type: ROOM_TYPES.BEDROOM,
+    zone: ZONES.PRIVATE,
+    bounds: { x: Number((wing2X + bath2W).toFixed(2)), y: yBed2, width: mainBed2W, length: bed2L },
+    finish: 'Matte Oak Hardwood Vitrified',
     orientation: 'South-East',
-    doors: [{ x: bath4X, y: Number((yGuestSuite + guestSuiteL / 2).toFixed(2)), width: 2.5, wall: 'west' }],
+    doors: [
+      { x: Number((wing2X + bath2W + mainBed2W / 2).toFixed(2)), y: yBed2, width: 3.0, wall: 'north' },
+      { x: Number((wing2X + bath2W).toFixed(2)), y: Number((yBed2 + bed2L / 2).toFixed(2)), width: 2.5, wall: 'west', label: 'En-suite Door' }
+    ],
     windows: [
-      { x: Number((bath4X + bath4W).toFixed(2)), y: Number((yGuestSuite + guestSuiteL / 2).toFixed(2)), width: 2.0, wall: 'east', label: 'Vent' },
-      { x: Number((bath4X + bath4W / 2).toFixed(2)), y: Number((yGuestSuite + guestSuiteL).toFixed(2)), width: 2.0, wall: 'south', label: 'Vent' }
+      { x: Number((wing2X + wing2W).toFixed(2)), y: Number((yBed2 + bed2L / 2).toFixed(2)), width: 5.0, wall: 'east' },
+      { x: Number((wing2X + bath2W + mainBed2W / 2).toFixed(2)), y: Number((yBed2 + bed2L).toFixed(2)), width: 4.5, wall: 'south' }
     ]
   }));
 

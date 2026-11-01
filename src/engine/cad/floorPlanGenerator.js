@@ -812,22 +812,22 @@ export function layoutCadRoomLabel(room, scale = 9.5, columns = [], pxFn = null,
   else if (rawName.includes('STAIR')) rawName = 'STAIRS';
   else if (rawName.includes('KITCHEN')) rawName = 'KITCHEN';
   else if (rawName.includes('DINING')) rawName = 'DINING';
-  else if (rawName.includes('LIVING')) rawName = maxAvailW < 110 ? 'LIVING' : 'LIVING LOUNGE';
-  else if (rawName.includes('BATH') || rawName.includes('TOILET')) rawName = maxAvailW < 90 ? 'BATH' : 'BATH & TOILET';
-  else if (rawName.includes('CAR PORCH') || rawName.includes('PORTICO')) rawName = maxAvailW < 110 ? 'CAR PORCH' : 'PORCH & PORTICO';
-  else if (rawName.includes('FOYER') || rawName.includes('VERANDAH')) rawName = maxAvailW < 110 ? 'FOYER' : 'FOYER & VERANDAH';
+  else if (rawName.includes('LIVING')) rawName = maxAvailW < 130 ? 'LIVING' : 'LIVING LOUNGE';
+  else if (rawName.includes('BATH') || rawName.includes('TOILET')) rawName = maxAvailW < 80 ? 'BATH' : 'BATH & TOILET';
+  else if (rawName.includes('CAR PORCH') || rawName.includes('PORTICO')) rawName = maxAvailW < 130 ? 'CAR PORCH' : 'PORCH & PORTICO';
+  else if (rawName.includes('FOYER') || rawName.includes('VERANDAH')) rawName = maxAvailW < 130 ? 'FOYER' : 'FOYER & VERANDAH';
   else if (rawName.includes('MASTER')) rawName = 'MASTER BED';
   else if (rawName.includes('BEDROOM') || rawName.includes('BED')) {
-    if (rawName.includes('2') || rawName.includes('GUEST') || rawName.includes('CHILD')) rawName = maxAvailW < 90 ? 'BED 2' : 'GUEST BED';
-    else if (rawName.includes('3')) rawName = maxAvailW < 90 ? 'BED 3' : 'BEDROOM 3';
-    else rawName = 'BEDROOM';
+    if (rawName.includes('2') || rawName.includes('GUEST') || rawName.includes('CHILD')) rawName = maxAvailW < 85 ? 'BED 2' : 'GUEST BED';
+    else if (rawName.includes('3')) rawName = maxAvailW < 85 ? 'BED 3' : 'BEDROOM 3';
+    else rawName = maxAvailW < 75 ? 'BED' : 'BEDROOM';
   }
   else if (rawName.includes('COURTYARD') || rawName.includes('MUTTAM')) rawName = 'COURTYARD';
   else if (rawName.includes('BALCONY')) rawName = 'BALCONY';
   else if (rawName.includes('TERRACE')) rawName = 'TERRACE';
 
   // Name font size and line wrapping
-  let targetFontSize = maxAvailW > 120 ? 9.2 : maxAvailW > 75 ? 8.2 : 7.0;
+  let targetFontSize = maxAvailW > 120 ? 9.0 : maxAvailW > 75 ? 8.0 : 6.8;
   let nameLines = [rawName];
 
   if (rawName.length * targetFontSize * 0.58 > maxAvailW && rawName.includes(' ')) {
@@ -851,21 +851,21 @@ export function layoutCadRoomLabel(room, scale = 9.5, columns = [], pxFn = null,
     nameFontSize = Math.max(5.5, Number((maxAvailW / (longestNameLen * 0.58)).toFixed(1)));
   }
 
-  // Dimension lines
+  // Dimension lines: clean, non-colliding formatting
   const dimStr = room.nominalDimLabel || `${b.width.toFixed(1)}′ × ${b.length.toFixed(1)}′`;
   const sqftStr = room.areaSqft ? `(${room.areaSqft} sq.ft)` : '';
   const fullDim = dimStr && sqftStr ? `${dimStr} ${sqftStr}` : dimStr || sqftStr;
 
-  let dimFontSize = Math.min(7.5, Math.max(5.4, Number((nameFontSize - 0.7).toFixed(1))));
+  let dimFontSize = Math.min(7.2, Math.max(5.2, Number((nameFontSize - 0.8).toFixed(1))));
   let dimLines = [];
 
-  if (fullDim.length * dimFontSize * 0.55 <= (maxAvailW - 8) && maxAvailW >= 100) {
+  if (fullDim.length * dimFontSize * 0.55 <= (maxAvailW - 10) && maxAvailW >= 125) {
     dimLines = [fullDim];
-  } else if (dimStr && sqftStr && maxAvailH >= 34) {
+  } else if (dimStr && sqftStr && maxAvailH >= 32 && maxAvailW >= 55) {
     let dSize = dimFontSize;
     const maxDLen = Math.max(dimStr.length, sqftStr.length);
     if (maxDLen * dSize * 0.55 > maxAvailW) {
-      dSize = Math.max(5.2, Number((maxAvailW / (maxDLen * 0.55)).toFixed(1)));
+      dSize = Math.max(5.0, Number((maxAvailW / (maxDLen * 0.55)).toFixed(1)));
     }
     dimFontSize = dSize;
     dimLines = [dimStr, sqftStr];
@@ -1335,8 +1335,7 @@ export function generateFloorPlanSvg(design, options = {}) {
       svgParts.push(`      <rect x="${bx}" y="${by}" width="${bw}" height="${bh}" rx="4" fill="rgba(255, 255, 255, 0.94)" stroke="#CBD5E1" stroke-width="0.8" />\n`);
 
       layout.renderedLines.forEach(line => {
-        const textLen = line.textLength ? ` textLength="${line.textLength}" lengthAdjust="spacingAndGlyphs"` : '';
-        svgParts.push(`      <text x="${line.x}" y="${line.y}" text-anchor="middle" dominant-baseline="central" font-size="${line.fontSize}" font-weight="${line.fontWeight}" fill="${line.color}"${textLen}>${line.text}</text>\n`);
+        svgParts.push(`      <text x="${line.x}" y="${line.y}" text-anchor="middle" dominant-baseline="central" font-size="${line.fontSize}" font-weight="${line.fontWeight}" fill="${line.color}" stroke="#FFFFFF" stroke-width="2.5" paint-order="stroke fill" font-family="system-ui, -apple-system, sans-serif">${line.text}</text>\n`);
       });
       svgParts.push(`    </g>\n`);
     });
